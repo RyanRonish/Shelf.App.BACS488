@@ -8,9 +8,21 @@
 import SwiftUI
 import Firebase
 
+
+
+//class AppDelegate: NSObject, UIApplicationDelegate {
+//  func application(_ application: UIApplication,
+//                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+//    FirebaseApp.configure()
+//    return true
+//  }
+//}
+
 @main
 struct Shelf_App_BACS488App: App {
     //let persistenceController = PersistenceController.shared
+    // register app delegate for Firebase setup
+    //@UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var viewModel = AuthViewModel()
     
     init() {
@@ -19,9 +31,11 @@ struct Shelf_App_BACS488App: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            //NavigationView {
+                ContentView()
                 //.environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .environmentObject(viewModel)
-        }
+                    .environmentObject(viewModel)
+            }
+        //}
     }
 }

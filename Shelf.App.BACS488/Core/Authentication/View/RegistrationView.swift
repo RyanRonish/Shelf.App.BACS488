@@ -49,8 +49,12 @@ struct RegistrationView: View {
             
             Button {
                 Task {
-                    try await viewModel.createUser(withEmail: email,
-                                                   password: password, fullname: fullName)
+                    do {
+                        try await viewModel.createUser(withEmail: email,
+                                                       password: password, fullname: fullName)
+                    }catch {
+                        print("Error: \(error.localizedDescription)")
+                    }
                 }
             } label: {
                 HStack {
