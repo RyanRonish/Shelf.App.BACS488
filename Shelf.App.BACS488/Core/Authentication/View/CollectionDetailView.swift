@@ -8,11 +8,39 @@
 import SwiftUI
 
 struct CollectionDetailView: View {
+    let collection: BookCollection
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            Text(collection.name)
+                .font(.largeTitle)
+                .bold()
+                .padding(.top)
+
+            List(collection.books) { book in
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(book.title)
+                            .font(.headline)
+                        Text(book.author)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                    Spacer()
+                }
+                .padding()
+            }
+        }
+        .navigationTitle("Books in \(collection.name)")
     }
 }
 
 #Preview {
-    CollectionDetailView()
+    CollectionDetailView(collection: BookCollection(
+        name: "Favorites",
+        books: [
+            Book(title: "The Hobbit", author: "J.R.R. Tolkien"),
+            Book(title: "1984", author: "George Orwell")
+        ]
+    ))
 }

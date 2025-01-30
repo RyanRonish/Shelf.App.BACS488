@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		68CED1932D4B826000409701 /* CollectionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CED1922D4B826000409701 /* CollectionDetailView.swift */; };
+		68CED1952D4B844700409701 /* BookCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CED1942D4B844700409701 /* BookCollection.swift */; };
+		68CED1972D4B84CF00409701 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CED1962D4B84CF00409701 /* Book.swift */; };
 		68D39A202D4AF107004C16F6 /* Shelf_App_BACS488App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D39A1F2D4AF107004C16F6 /* Shelf_App_BACS488App.swift */; };
 		68D39A222D4AF107004C16F6 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D39A212D4AF107004C16F6 /* ContentView.swift */; };
 		68D39A242D4AF108004C16F6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 68D39A232D4AF108004C16F6 /* Assets.xcassets */; };
@@ -25,9 +28,13 @@
 		68D39A4E2D4B2F12004C16F6 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 68D39A4D2D4B2F12004C16F6 /* FirebaseFirestore */; };
 		68D39A502D4B2F12004C16F6 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 68D39A4F2D4B2F12004C16F6 /* FirebaseStorage */; };
 		68D39A542D4B3006004C16F6 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D39A532D4B3006004C16F6 /* AuthViewModel.swift */; };
+		68D39A562D4B684C004C16F6 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D39A552D4B684C004C16F6 /* HomeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		68CED1922D4B826000409701 /* CollectionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionDetailView.swift; sourceTree = "<group>"; };
+		68CED1942D4B844700409701 /* BookCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCollection.swift; sourceTree = "<group>"; };
+		68CED1962D4B84CF00409701 /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Book.swift; sourceTree = "<group>"; };
 		68D39A1C2D4AF107004C16F6 /* Shelf.App.BACS488.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shelf.App.BACS488.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		68D39A1F2D4AF107004C16F6 /* Shelf_App_BACS488App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shelf_App_BACS488App.swift; sourceTree = "<group>"; };
 		68D39A212D4AF107004C16F6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -44,6 +51,7 @@
 		68D39A462D4B1D27004C16F6 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		68D39A482D4B2A6B004C16F6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		68D39A532D4B3006004C16F6 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		68D39A552D4B684C004C16F6 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +113,8 @@
 			isa = PBXGroup;
 			children = (
 				68D39A462D4B1D27004C16F6 /* User.swift */,
+				68CED1942D4B844700409701 /* BookCollection.swift */,
+				68CED1962D4B84CF00409701 /* Book.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -166,6 +176,8 @@
 			children = (
 				68D39A382D4AF4D9004C16F6 /* LoginView.swift */,
 				68D39A3A2D4AF4F3004C16F6 /* RegistrationView.swift */,
+				68D39A552D4B684C004C16F6 /* HomeView.swift */,
+				68CED1922D4B826000409701 /* CollectionDetailView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -261,13 +273,17 @@
 				68D39A432D4B1228004C16F6 /* ProfileView.swift in Sources */,
 				68D39A2C2D4AF108004C16F6 /* Shelf_App_BACS488.xcdatamodeld in Sources */,
 				68D39A3E2D4AF520004C16F6 /* InputView.swift in Sources */,
+				68CED1932D4B826000409701 /* CollectionDetailView.swift in Sources */,
 				68D39A292D4AF108004C16F6 /* Persistence.swift in Sources */,
 				68D39A222D4AF107004C16F6 /* ContentView.swift in Sources */,
 				68D39A3B2D4AF4F3004C16F6 /* RegistrationView.swift in Sources */,
 				68D39A392D4AF4D9004C16F6 /* LoginView.swift in Sources */,
+				68CED1972D4B84CF00409701 /* Book.swift in Sources */,
 				68D39A542D4B3006004C16F6 /* AuthViewModel.swift in Sources */,
 				68D39A202D4AF107004C16F6 /* Shelf_App_BACS488App.swift in Sources */,
+				68D39A562D4B684C004C16F6 /* HomeView.swift in Sources */,
 				68D39A472D4B1D27004C16F6 /* User.swift in Sources */,
+				68CED1952D4B844700409701 /* BookCollection.swift in Sources */,
 				68D39A452D4B14F4004C16F6 /* SettingsRowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -6,3 +6,10 @@
 //
 
 import Foundation
+import FirebaseFirestore
+
+struct Book: Identifiable, Codable {
+    @DocumentID var id: String?
+    let title: String
+    let author: String
+}

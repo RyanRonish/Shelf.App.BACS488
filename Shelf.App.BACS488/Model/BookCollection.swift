@@ -6,3 +6,10 @@
 //
 
 import Foundation
+import FirebaseFirestore
+
+struct BookCollection: Identifiable, Codable {
+    @DocumentID var id: String?
+    let name: String
+    var books: [Book] = []
+}
