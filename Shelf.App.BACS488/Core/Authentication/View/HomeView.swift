@@ -91,7 +91,6 @@ struct HomeView: View {
 struct CollectionCard: View {
     let collection: BookCollection
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
         VStack {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.green.opacity(0.3))
