@@ -10,7 +10,6 @@ import SwiftUI
 struct CollectionDetailView: View {
     let collection: BookCollection
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
         VStack {
             Text(collection.name)
                 .font(.largeTitle)
@@ -35,7 +34,7 @@ struct CollectionDetailView: View {
 }
 
 #Preview {
-    CollectionDetailView()
+    //CollectionDetailView()
     CollectionDetailView(collection: BookCollection(
         name: "Favorites",
         books: [
