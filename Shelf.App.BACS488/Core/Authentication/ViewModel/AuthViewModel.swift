@@ -41,8 +41,15 @@ class AuthViewModel: ObservableObject {
         }
         
     }
-    
+    // should take us to the login screen and sign out of firebase access
     func signOut() {
+        do {
+            try Auth.auth().signOut() // signs out user on backend
+            self.userSession = nil // ends user session and returns the user to the login screen
+            self.currentUser = nil // releases the user information (data model) this way it ensures when you login it logs into your profile
+        } catch {
+            print("DEBUG: Failed to sign out with error \(error.localizedDescription)")
+        }
         
     }
     
