@@ -7,7 +7,7 @@
 
 // Test to see if this makes it to Github
 
-// Youtube video to help me build the login https://www.youtube.com/watch?v=QJHmhLGv-_0
+
 
 
 import SwiftUI
