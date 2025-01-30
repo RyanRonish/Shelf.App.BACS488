@@ -39,8 +39,8 @@ struct CollectionDetailView: View {
     CollectionDetailView(collection: BookCollection(
         name: "Favorites",
         books: [
-            Book(title: "The Hobbit", author: "J.R.R. Tolkien"),
-            Book(title: "1984", author: "George Orwell")
+            Book(title: "The Hobbit", author: "J.R.R. Tolkien", isbn: "978-0261102217", thumbnailURL: "https://example.com/hobbit.jpg"),
+            Book(title: "1984", author: "George Orwell", isbn: "978-0451524935", thumbnailURL: "https://example.com/1984.jpg")
         ]
     ))
 }

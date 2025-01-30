@@ -6,13 +6,90 @@
 //
 
 import SwiftUI
+import Vision
+import VisionKit
 
-struct ISBNScannerView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct ISBNScannerView: UIViewControllerRepresentable {
+    @Binding var scannedBook: Book?
+
+    func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
+        let scanner = VNDocumentCameraViewController()
+        scanner.delegate = context.coordinator
+        return scanner
+    }
+
+    func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(self)
+    }
+
+    class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
+        var parent: ISBNScannerView
+        
+        init(_ parent: ISBNScannerView) {
+            self.parent = parent
+        }
+        
+        func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
+            guard scan.pageCount > 0 else {
+                controller.dismiss(animated: true)
+                return
+            }
+
+            let image = scan.imageOfPage(at: 0)
+            processImage(image)
+
+            controller.dismiss(animated: true)
+        }
+
+        func processImage(_ image: UIImage) {
+            guard let cgImage = image.cgImage else { return }
+
+            let request = VNRecognizeTextRequest { request, error in
+                if let error = error {
+                    print("Error recognizing text: \(error.localizedDescription)")
+                    return
+                }
+
+                let recognizedTexts = request.results as? [VNRecognizedTextObservation]
+                let isbnCandidates = recognizedTexts?.compactMap { $0.topCandidates(1).first?.string }
+
+                if let isbn = isbnCandidates?.first(where: { $0.count == 10 || $0.count == 13 }) {
+                    DispatchQueue.main.async {
+                        self.fetchBookDetails(isbn: isbn)
+                    }
+                } else {
+                    print("No valid ISBN found")
+                }
+            }
+
+            request.recognitionLevel = .accurate
+
+            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    try handler.perform([request])
+                } catch {
+                    print("Failed to process image: \(error)")
+                }
+            }
+        }
+
+        func fetchBookDetails(isbn: String) {
+            BookAPI.shared.fetchBookDetails(isbn: isbn) { book in
+                DispatchQueue.main.async {
+                    self.parent.scannedBook = book
+                }
+            }
+        }
+
+        func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+            controller.dismiss(animated: true)
+        }
     }
 }
 
 #Preview {
-    ISBNScannerView()
+    ISBNScannerView(scannedBook: .constant(nil))
 }

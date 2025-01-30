@@ -8,8 +8,9 @@
 import Foundation
 import FirebaseFirestore
 
-struct BookCollection: Identifiable, Codable {
+struct BookCollection: Codable, Identifiable {
     @DocumentID var id: String?
-    let name: String
-    var books: [Book] = []
+    var name: String
+    var books: [Book]
 }
+
