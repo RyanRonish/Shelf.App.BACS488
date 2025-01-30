@@ -54,7 +54,7 @@ struct RegistrationView: View {
                 }
             } label: {
                 HStack {
-                    Text("SIGN IN")
+                    Text("SIGN UP")
                         .fontWeight(.semibold)
                     Image(systemName: "arrow.right")
                 }
