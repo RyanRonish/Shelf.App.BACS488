@@ -4,7 +4,7 @@
 //
 //  Created by Ryan Ronish on 1/30/25.
 //
-
+/*
 import SwiftUI
 
 struct ManualBookEntryView: View {
@@ -54,3 +54,4 @@ struct ManualBookEntryView: View {
 #Preview {
     ManualBookEntryView()
 }
+*/

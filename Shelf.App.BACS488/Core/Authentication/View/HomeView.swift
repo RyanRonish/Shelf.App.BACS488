@@ -11,7 +11,6 @@ struct HomeView: View {
     @EnvironmentObject var viewModel: AuthViewModel
     @State private var showAddCollectionSheet = false
     @State private var newCollectionName = ""
-
     var body: some View {
         NavigationView {
             VStack {
@@ -20,7 +19,6 @@ struct HomeView: View {
                     .font(.largeTitle)
                     .bold()
                     .padding(.top)
-
                 // Display User's Collections
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
@@ -32,7 +30,6 @@ struct HomeView: View {
                     }
                     .padding()
                 }
-
                 // Add Collection Button
                 Button(action: { showAddCollectionSheet = true }) {
                     HStack {
@@ -54,7 +51,6 @@ struct HomeView: View {
             }
         }
     }
-
     // Profile button in the navigation bar
     private var profileButton: some View {
         NavigationLink(destination: ProfileView()) {
@@ -64,7 +60,6 @@ struct HomeView: View {
                 .foregroundColor(.blue)
         }
     }
-
     // Sheet for adding a new collection
     private var addCollectionSheet: some View {
         VStack {
@@ -72,11 +67,9 @@ struct HomeView: View {
                 .font(.title2)
                 .bold()
                 .padding()
-
             TextField("Collection Name", text: $newCollectionName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-
             Button("Save") {
                 Task {
                     await viewModel.addCollection(name: newCollectionName)
@@ -94,12 +87,11 @@ struct HomeView: View {
         .padding()
     }
 }
-
 // MARK: - Collection Card View
 struct CollectionCard: View {
     let collection: BookCollection
-
     var body: some View {
+        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
         VStack {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.green.opacity(0.3))
@@ -118,8 +110,6 @@ struct CollectionCard: View {
         .frame(width: 150)
     }
 }
-
-
 
 #Preview {
     HomeView()

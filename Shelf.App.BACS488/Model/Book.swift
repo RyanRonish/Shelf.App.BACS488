@@ -7,11 +7,8 @@
 
 import Foundation
 import FirebaseFirestore
-
-struct Book: Identifiable, Decodable {
-    var id = UUID().uuidString
+struct Book: Identifiable, Codable {
+    @DocumentID var id: String?
     let title: String
     let author: String
-    let isbn: String
-    let thumbnailURL: String?
 }

@@ -9,14 +9,13 @@ import SwiftUI
 
 struct CollectionDetailView: View {
     let collection: BookCollection
-
     var body: some View {
+        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
         VStack {
             Text(collection.name)
                 .font(.largeTitle)
                 .bold()
                 .padding(.top)
-
             List(collection.books) { book in
                 HStack {
                     VStack(alignment: .leading) {
@@ -36,11 +35,12 @@ struct CollectionDetailView: View {
 }
 
 #Preview {
+    CollectionDetailView()
     CollectionDetailView(collection: BookCollection(
         name: "Favorites",
         books: [
-            Book(title: "The Hobbit", author: "J.R.R. Tolkien", isbn: "978-0261102217", thumbnailURL: "https://example.com/hobbit.jpg"),
-            Book(title: "1984", author: "George Orwell", isbn: "978-0451524935", thumbnailURL: "https://example.com/1984.jpg")
+            Book(title: "The Hobbit", author: "J.R.R. Tolkien"),
+            Book(title: "1984", author: "George Orwell")
         ]
     ))
 }
