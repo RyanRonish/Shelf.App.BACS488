@@ -4,7 +4,7 @@
 //
 //  Created by Ryan Ronish on 1/30/25.
 //
-/*
+
 import Foundation
 
 class BookAPI {
@@ -35,7 +35,7 @@ class BookAPI {
                         title: bookItem.volumeInfo.title,
                         author: bookItem.volumeInfo.authors?.first ?? "Unknown",
                         isbn: isbn,
-                        thumbnailURL: bookItem.volumeInfo.imageLinks?.thumbnail ?? default value
+                        thumbnailURL: bookItem.volumeInfo.imageLinks?.thumbnail ?? "https://example.com/default-thumbnail.jpg"
                     )
                     completion(book)
                 } else {
@@ -69,4 +69,4 @@ struct ImageLinks: Decodable {
     let thumbnail: String?
 }
 
-*/
+

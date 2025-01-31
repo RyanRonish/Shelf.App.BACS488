@@ -4,7 +4,7 @@
 //
 //  Created by Ryan Ronish on 1/30/25.
 //
-/* 
+ 
 import SwiftUI
 import Vision
 import VisionKit
@@ -93,4 +93,4 @@ struct ISBNScannerView: UIViewControllerRepresentable {
 #Preview {
     ISBNScannerView(scannedBook: .constant(nil))
 }
-*/
+
