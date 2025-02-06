@@ -47,7 +47,7 @@ struct AddBookView: View {
                         .font(.headline)
                         .padding(.top)
 
-                    if let imageURL = book.thumbnailURL, let url = URL(string: imageURL) {
+                    if let url = URL(string: book.thumbnailURL) {
                         AsyncImage(url: url)
                             .frame(width: 100, height: 150)
                             .cornerRadius(10)

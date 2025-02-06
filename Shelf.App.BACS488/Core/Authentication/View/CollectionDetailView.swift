@@ -8,33 +8,90 @@
 import SwiftUI
 
 struct CollectionDetailView: View {
-    let collection: BookCollection
+    @ObservedObject var collection: BookCollection  // Now works because BookCollection is ObservableObject
+    @EnvironmentObject var library: Library
+    @Environment(\.presentationMode) var presentationMode
+
     var body: some View {
         VStack {
             Text(collection.name)
                 .font(.largeTitle)
                 .bold()
                 .padding(.top)
-            List(collection.books) { book in
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(book.title)
-                            .font(.headline)
-                        Text(book.author)
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+
+            List {
+                ForEach(collection.books) { book in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(book.title)
+                                .font(.headline)
+                            Text(book.author)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
                     }
-                    Spacer()
+                    .padding()
                 }
-                .padding()
+                .onDelete(perform: deleteBook)
             }
+            .listStyle(InsetGroupedListStyle())
+
+            Spacer()
+
+            HStack {
+                Button(action: addBookManually) {
+                    Label("Add Book", systemImage: "plus")
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
+                }
+
+                Button(action: scanBook) {
+                    Label("Scan Book", systemImage: "barcode.viewfinder")
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
+                }
+            }
+            .padding()
         }
         .navigationTitle("Books in \(collection.name)")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(role: .destructive, action: deleteCollection) {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
+        }
+    }
+
+    // MARK: - Delete Collection
+    private func deleteCollection() {
+        library.removeCollection(collection)
+        presentationMode.wrappedValue.dismiss()
+    }
+
+    // MARK: - Delete Book
+    private func deleteBook(at offsets: IndexSet) {
+        collection.books.remove(atOffsets: offsets)
+        library.save()
+    }
+
+    // MARK: - Add Book Manually
+    private func addBookManually() {
+        library.showBookForm(for: collection)
+    }
+
+    // MARK: - Scan Book
+    private func scanBook() {
+        library.scanBook(for: collection)
     }
 }
 
 #Preview {
-    //CollectionDetailView()
     CollectionDetailView(collection: BookCollection(
         name: "Favorites",
         books: [

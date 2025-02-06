@@ -33,6 +33,7 @@
 		68D39A502D4B2F12004C16F6 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 68D39A4F2D4B2F12004C16F6 /* FirebaseStorage */; };
 		68D39A542D4B3006004C16F6 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D39A532D4B3006004C16F6 /* AuthViewModel.swift */; };
 		68D39A562D4B684C004C16F6 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D39A552D4B684C004C16F6 /* HomeView.swift */; };
+		68F43CD32D542D4B00530D26 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F43CD22D542D4B00530D26 /* Library.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +61,7 @@
 		68D39A482D4B2A6B004C16F6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		68D39A532D4B3006004C16F6 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		68D39A552D4B684C004C16F6 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		68F43CD22D542D4B00530D26 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +126,7 @@
 				68CED1942D4B844700409701 /* BookCollection.swift */,
 				68CED1962D4B84CF00409701 /* Book.swift */,
 				68CED19E2D4B98F900409701 /* BookAPI.swift */,
+				68F43CD22D542D4B00530D26 /* Library.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -299,6 +302,7 @@
 				68CED1992D4B958500409701 /* AddBookView.swift in Sources */,
 				68D39A562D4B684C004C16F6 /* HomeView.swift in Sources */,
 				68D39A472D4B1D27004C16F6 /* User.swift in Sources */,
+				68F43CD32D542D4B00530D26 /* Library.swift in Sources */,
 				68CED1952D4B844700409701 /* BookCollection.swift in Sources */,
 				68D39A452D4B14F4004C16F6 /* SettingsRowView.swift in Sources */,
 			);
@@ -434,6 +438,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Shelf.App.BACS488/Preview Content\"";
+				DEVELOPMENT_TEAM = 3428GF3ULW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -462,6 +467,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Shelf.App.BACS488/Preview Content\"";
+				DEVELOPMENT_TEAM = 3428GF3ULW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
