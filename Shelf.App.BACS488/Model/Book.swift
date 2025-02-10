@@ -9,11 +9,11 @@ import Foundation
 import FirebaseFirestore
 
 struct Book: Identifiable, Codable {
-    let id: String
-    let title: String
-    let author: String
-    let isbn: String
-    let thumbnailURL: String
+    var id: String = UUID().uuidString
+    var title: String
+    var author: String
+    var isbn: String
+    var thumbnailURL: String
 
     init(id: String = UUID().uuidString, title: String, author: String, isbn: String, thumbnailURL: String) {
         self.id = id

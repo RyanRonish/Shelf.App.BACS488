@@ -5,21 +5,20 @@
 //  Created by Ryan Ronish on 1/29/25.
 //
 
-// Test to see if this makes it to Github
-
-
-
 
 import SwiftUI
 import CoreData
 
+
 struct ContentView: View {
     @EnvironmentObject var viewModel: AuthViewModel
+    @StateObject var library = Library()
     
     var body: some View {
         Group {
             if viewModel.userSession != nil {
                 HomeView()
+                    .environmentObject(library)
             } else {
                 LoginView()
             }

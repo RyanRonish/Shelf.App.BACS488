@@ -11,6 +11,7 @@ struct HomeView: View {
     @EnvironmentObject var viewModel: AuthViewModel
     @State private var showAddCollectionSheet = false
     @State private var newCollectionName = ""
+    
     var body: some View {
         NavigationView {
             VStack {

@@ -6,67 +6,100 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct ProfileView: View {
     @EnvironmentObject var viewModel: AuthViewModel
+    @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var selectedImageData: Data? = nil
+    @State private var newBio: String = ""
+    @State private var isEditing: Bool = false // gets edit mode for users to add dif parts to profile
+    
     var body: some View {
         if let user = viewModel.currentUser {
             List {
                 Section {
                     HStack {
-                        Text(user.initials)
-                            .font(.title)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                            .frame(width: 72, height: 72)
-                            .background(Color(.systemGray3))
-                            .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(user.fullname)
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .padding(.top, 4)
-                            
-                            Text(user.email)
-                                .font(.footnote)
-                                .accentColor(.gray)
+                        PhotosPicker(selection: $selectedItem, matching: .images) {
+                            if let selectedImageData, let uiImage = UIImage(data: selectedImageData) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .frame(width: 72, height: 72)
+                                    .clipShape(Circle())
+                            } else if let avatarUrl = user.avatarUrl, let url = URL(string: avatarUrl) {
+                                AsyncImage(url: url) { image in
+                                    image.resizable()
+                                } placeholder: {
+                                    ProgressView()
+                                }
+                                .frame(width: 72, height: 72)
+                                .clipShape(Circle())
+                            } else {
+                                Text(user.initials)
+                                    .frame(width: 72, height: 72)
+                                    .background(Color(.systemGray3))
+                                    .clipShape(Circle())
+                            }
+                        }
+                        .onChange(of: selectedItem) { newItem in
+                            Task {
+                                if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                                    selectedImageData = data
+                                    await viewModel.uploadProfilePicture(data: data)
+                                }
+                            }
+                        }
+                        
+                        VStack(alignment: .leading) {
+                            Text(user.fullname).font(.headline)
+                            Text(user.email).font(.subheadline).foregroundColor(.gray)
                         }
                     }
                 }
                 
-                Section("General") {
-                    HStack {
-                        SettingsRowView(imageName: "gear", title: "Version", tintColor: Color(.systemGray))
-                        
-                        Spacer()
-                        
-                        Text("1.0.0")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+                Section("About Me") {
+                    if isEditing{
+                        TextField("Enter a short bio...", text: $newBio)
+                        Button("Save Bio") {
+                            Task {
+                                await viewModel.updateUserField(field: "bio", value: newBio)
+                                isEditing = false
+                            }
+                        }
+                    } else {
+                        Text(user.bio ?? "No bio added.")
+                            .foregroundColor(user.bio == nil ? .gray : .primary)
+                            .onTapGesture {
+                                newBio = user.bio ?? ""
+                                isEditing = true
+                            }
                     }
                 }
-                
-                Section("Account") {
-                    
-                    Button{
-                        viewModel.signOut()
-                    } label: {
-                        SettingsRowView(imageName: "arrow.left.circle.fill", title: "Sign out", tintColor: .red)
-                    }
-                    
-                    Button{
-                        print("Delete Account")
-                    } label: {
-                        SettingsRowView(imageName: "xmark.circle.fill", title: "Delete Account", tintColor: .red)
-                    }
+            }
+            
+            Section("Preferences") {
+                Toggle("Dark Mode", isOn: Binding(
+                    get: { user.isDarkModeEnabled },
+                    set: { value in Task { await viewModel.updateUserField(field: "isDarkModeEnabled", value: value) } }
+                ))
+            }
+            
+            Section("Account") {
+                Button("Sign Out") { viewModel.signOut() }.foregroundColor(.red)
+            }
+        } else {
+            Text("Loading user profile...").onAppear {
+                Task {
+                    await viewModel.fetchUser()
                 }
             }
         }
     }
 }
 
+
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileView()
+        ProfileView().environmentObject(AuthViewModel())
     }
 }
