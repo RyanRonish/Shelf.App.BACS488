@@ -55,7 +55,7 @@ struct AddBookView: View {
         let newBook = Book(title: title, author: author, isbn: isbn.isEmpty ? nil : isbn, thumbnailURL: thumbnailURL.isEmpty ? nil : thumbnailURL)
 
         Task {
-            await authViewModel.addBookToCollection(collection: collection, book: newBook)
+            await authViewModel.addBookToCollection(collectionId: collection.id ?? "", book: newBook)
             presentationMode.wrappedValue.dismiss()
         }
     }
