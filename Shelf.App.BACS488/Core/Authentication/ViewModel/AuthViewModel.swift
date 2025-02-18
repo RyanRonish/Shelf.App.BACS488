@@ -84,7 +84,10 @@ class AuthViewModel: ObservableObject {
 
     // Fetch user's collections from Firestore
     func fetchUserCollections() async {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+        guard let uid = Auth.auth().currentUser?.uid else {
+            print("DEBUG: No authenticated user found.")
+            return
+        }
 
         let snapshot = try? await Firestore.firestore()
             .collection("users")
@@ -92,25 +95,37 @@ class AuthViewModel: ObservableObject {
             .collection("collections")
             .getDocuments()
 
-        if let documents = snapshot?.documents {
-            self.collections = documents.compactMap { try? $0.data(as: BookCollection.self) }
+        DispatchQueue.main.async {
+            if let documents = snapshot?.documents {
+                self.collections = documents.compactMap { doc in
+                    var collection = try? doc.data(as: BookCollection.self)
+                    collection?.id = doc.documentID // ✅ Manually assign the Firestore ID
+                    return collection
+                }
+                print("DEBUG: Fetched \(self.collections.count) collections from Firestore")
+            }
         }
     }
 
     // Add a new book collection
     func addCollection(name: String) async {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+        guard let uid = Auth.auth().currentUser?.uid else {
+            print("DEBUG: No authenticated user found.")
+            return
+        }
 
-        let newCollection = BookCollection(name: name, books: [])
-        let newCollectionRef = Firestore.firestore()
-            .collection("users")
+        let db = Firestore.firestore()
+        let newCollectionRef = db.collection("users")
             .document(uid)
             .collection("collections")
             .document()
+        
+        var newCollection = BookCollection(name: name)
+        newCollection.id = newCollectionRef.documentID
 
         do {
             try await newCollectionRef.setData(from: newCollection)
-            print("DEBUG: Collection successfully added with ID:", newCollectionRef.documentID)
+            print("DEBUG: Collection successfully added with ID:", newCollection.id ?? "No ID")
             await fetchUserCollections()
         } catch {
             print("DEBUG: Failed to add collection: \(error.localizedDescription)")
