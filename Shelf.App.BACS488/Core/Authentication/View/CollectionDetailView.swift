@@ -99,7 +99,11 @@ struct CollectionDetailView: View {
             } else {
                 print("Collection successfully deleted from Firestore")
                 DispatchQueue.main.async {
-                    library.removeCollection(collection) // Remove from local state
+                    // Remove from local app state
+                    if let index = library.collections.firstIndex(where: { $0.id == collectionID }) {
+                        library.collections.remove(at: index)
+                    }
+
                     presentationMode.wrappedValue.dismiss() // Navigate back
                 }
             }

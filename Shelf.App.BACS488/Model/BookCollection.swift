@@ -18,8 +18,7 @@ class BookCollection: ObservableObject, Identifiable, Codable {
         case id, name, books
     }
 
-    init(id: String = UUID().uuidString, name: String, books: [Book] = []) {
-        self.id = id
+    init(name: String, books: [Book] = []) {
         self.name = name
         self.books = books
     }
