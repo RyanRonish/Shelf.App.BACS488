@@ -15,10 +15,12 @@ struct AddBookView: View {
     @State private var author: String = ""
     @State private var isbn: String = ""
     @State private var thumbnailURL: String = ""
-    
+    @State private var selectedCollectionId: String?
+
     var body: some View {
         NavigationView {
             Form {
+                // 📌 Book Details
                 Section(header: Text("Book Details")) {
                     TextField("Title", text: $title)
                     TextField("Author", text: $author)
@@ -26,6 +28,23 @@ struct AddBookView: View {
                     TextField("Thumbnail URL (Optional)", text: $thumbnailURL)
                 }
                 
+                // 📌 Collection Selection (if no collection is pre-selected)
+                if authViewModel.selectedCollection == nil {
+                    Section(header: Text("Select Collection")) {
+                        if authViewModel.collections.isEmpty {
+                            Text("No collections available. Please create one first.")
+                                .foregroundColor(.gray)
+                        } else {
+                            Picker("Collection", selection: $selectedCollectionId) {
+                                ForEach(authViewModel.collections, id: \.id) { collection in
+                                    Text(collection.name).tag(collection.id)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 📌 Save Button
                 Section {
                     Button(action: addBook) {
                         HStack {
@@ -35,7 +54,7 @@ struct AddBookView: View {
                             Spacer()
                         }
                     }
-                    .disabled(title.isEmpty || author.isEmpty)
+                    .disabled(title.isEmpty || author.isEmpty || (selectedCollectionId == nil && authViewModel.selectedCollection == nil))
                 }
             }
             .navigationTitle("Add Book")
@@ -47,15 +66,32 @@ struct AddBookView: View {
                 }
             }
         }
+        .onAppear {
+            if selectedCollectionId == nil, let firstCollection = authViewModel.collections.first {
+                selectedCollectionId = firstCollection.id
+            }
+        }
     }
 
+    // 📌 Function to Add the Book
     private func addBook() {
-        guard let collection = authViewModel.selectedCollection else { return }
+        let collectionId = authViewModel.selectedCollection?.id ?? selectedCollectionId
 
-        let newBook = Book(title: title, author: author, isbn: isbn.isEmpty ? nil : isbn, thumbnailURL: thumbnailURL.isEmpty ? nil : thumbnailURL)
+        guard let collectionId = collectionId else {
+            print("DEBUG: No collection selected.")
+            return
+        }
+
+        let newBook = Book(
+            title: title,
+            author: author,
+            isbn: isbn.isEmpty ? nil : isbn,
+            thumbnailURL: thumbnailURL.isEmpty ? nil : thumbnailURL
+        )
 
         Task {
-            await authViewModel.addBookToCollection(collectionId: collection.id ?? "", book: newBook)
+            await authViewModel.addBookToCollection(collectionId: collectionId, book: newBook)
+            print("DEBUG: Book added manually to collection \(collectionId)")
             presentationMode.wrappedValue.dismiss()
         }
     }
