@@ -13,14 +13,14 @@ struct CollectionDetailView: View {
     @ObservedObject var collection: BookCollection  // Now works because BookCollection is ObservableObject
     @EnvironmentObject var library: Library
     @Environment(\.presentationMode) var presentationMode
-
+    
     var body: some View {
         VStack {
             Text(collection.name)
                 .font(.largeTitle)
                 .bold()
                 .padding(.top)
-
+            
             List {
                 ForEach(collection.books) { book in
                     HStack {
@@ -38,9 +38,9 @@ struct CollectionDetailView: View {
                 .onDelete(perform: deleteBook)
             }
             .listStyle(InsetGroupedListStyle())
-
+            
             Spacer()
-
+            
             HStack {
                 Button(action: addBookManually) {
                     Label("Add Book", systemImage: "plus")
@@ -49,7 +49,7 @@ struct CollectionDetailView: View {
                         .foregroundColor(.white)
                         .clipShape(Capsule())
                 }
-
+                
                 Button(action: scanBook) {
                     Label("Scan Book", systemImage: "barcode.viewfinder")
                         .padding()
@@ -63,76 +63,85 @@ struct CollectionDetailView: View {
         .navigationTitle("Books in \(collection.name)")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(role: .destructive, action: deleteCollection) {
+                Button(role: .destructive, action: {
+                    Task {
+                        await AuthViewModel.deleteCollection(collection) // ✅ Now calling function in AuthViewModel
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }) {
                     Label("Delete", systemImage: "trash")
                 }
             }
         }
     }
-
+    
     // MARK: - Delete Collection
     //private func deleteCollection() {
-        //library.removeCollection(collection)
-        //presentationMode.wrappedValue.dismiss()
+    //library.removeCollection(collection)
+    //presentationMode.wrappedValue.dismiss()
     //}
-
-    private func deleteCollection() {
-        guard let userID = Auth.auth().currentUser?.uid else {
-            print("DEBUG: No authenticated user found.")
-            return
-        }
-        
-        guard let collectionID = collection.id else {
-            print("DEBUG: Collection ID is missing.")
-            return
-        }
-
-        let db = Firestore.firestore()
-        let collectionRef = db.collection("users")
-            .document(userID)
-            .collection("collections")
-            .document(collectionID)
-
-        collectionRef.delete { error in
-            if let error = error {
-                print("Error deleting collection: \(error.localizedDescription)")
-            } else {
-                print("Collection successfully deleted from Firestore")
-                DispatchQueue.main.async {
-                    // Remove from local app state
-                    if let index = library.collections.firstIndex(where: { $0.id == collectionID }) {
-                        library.collections.remove(at: index)
-                    }
-
-                    presentationMode.wrappedValue.dismiss() // Navigate back
-                }
-            }
-        }
-    }
-
-    // MARK: - Delete Book
-    private func deleteBook(at offsets: IndexSet) {
-        collection.books.remove(atOffsets: offsets)
-        library.save()
-    }
-
-    // MARK: - Add Book Manually
-    private func addBookManually() {
-        library.showBookForm(for: collection)
-    }
-
-    // MARK: - Scan Book
-    private func scanBook() {
-        library.scanBook(for: collection)
-    }
+    /*
+     private func deleteCollection() {
+     guard let userID = Auth.auth().currentUser?.uid else {
+     print("DEBUG: No authenticated user found.")
+     return
+     }
+     
+     guard let collectionID = collection.id else {
+     print("DEBUG: Collection ID is missing.")
+     return
+     }
+     
+     let db = Firestore.firestore()
+     let collectionRef = db.collection("users")
+     .document(userID)
+     .collection("collections")
+     .document(collectionID)
+     
+     collectionRef.delete { error in
+     if let error = error {
+     print("Error deleting collection: \(error.localizedDescription)")
+     } else {
+     print("Collection successfully deleted from Firestore")
+     DispatchQueue.main.async {
+     // Remove from local app state
+     if let index = library.collections.firstIndex(where: { $0.id == collectionID }) {
+     library.collections.remove(at: index)
+     }
+     
+     presentationMode.wrappedValue.dismiss() // Navigate back
+     }
+     }
+     }
+     }
+     
+     */
+     /*
+     // MARK: - Delete Book
+     private func deleteBook(at offsets: IndexSet) {
+         collection.books.remove(atOffsets: offsets)
+         library.save()
+     }
+     */
+     // MARK: - Add Book Manually
+     private func addBookManually() {
+         library.showBookForm(for: collection)
+     }
+     
+     // MARK: - Scan Book
+     private func scanBook() {
+         library.scanBook(for: collection)
+     }
 }
 
-#Preview {
-    CollectionDetailView(collection: BookCollection(
-        name: "Favorites",
-        books: [
-            Book(title: "The Hobbit", author: "J.R.R. Tolkien", isbn: "isbn", thumbnailURL: "https://example.com/default-thumbnail.jpg"),
-            Book(title: "1984", author: "George Orwell", isbn: "isbn", thumbnailURL: "https://example.com/default-thumbnail.jpg")
-        ]
-    ))
-}
+    
+    
+    #Preview {
+        CollectionDetailView(collection: BookCollection(
+            name: "Favorites",
+            books: [
+                Book(title: "The Hobbit", author: "J.R.R. Tolkien", isbn: "isbn", thumbnailURL: "https://example.com/default-thumbnail.jpg"),
+                Book(title: "1984", author: "George Orwell", isbn: "isbn", thumbnailURL: "https://example.com/default-thumbnail.jpg")
+            ]
+        ))
+    }

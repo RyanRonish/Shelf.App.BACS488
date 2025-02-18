@@ -131,6 +131,39 @@ class AuthViewModel: ObservableObject {
             print("DEBUG: Failed to add collection: \(error.localizedDescription)")
         }
     }
+    
+    
+    func deleteCollection(_ collection: BookCollection) async {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("DEBUG: No authenticated user found.")
+            return
+        }
+        
+        guard let collectionID = collection.id else {
+            print("DEBUG: Collection ID is missing.")
+            return
+        }
+
+        let db = Firestore.firestore()
+        let collectionRef = db.collection("users")
+            .document(userID)
+            .collection("collections")
+            .document(collectionID)
+
+        do {
+            try await collectionRef.delete()
+            print("DEBUG: Collection successfully deleted from Firestore")
+
+            // ✅ Remove from local UI state
+            DispatchQueue.main.async {
+                self.collections.removeAll { $0.id == collectionID }
+                print("DEBUG: Remaining collections in UI:", self.collections.map { $0.name })
+            }
+
+        } catch {
+            print("DEBUG: Error deleting collection: \(error.localizedDescription)")
+        }
+    }
 
     // Update user profile fields (e.g., bio, avatar, dark mode)
     func updateUserField(field: String, value: Any) async {

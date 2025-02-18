@@ -23,7 +23,7 @@ struct Shelf_App_BACS488App: App {
     //let persistenceController = PersistenceController.shared
     // register app delegate for Firebase setup
     //@UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject var viewModel = AuthViewModel()
+    @StateObject var authViewModel = AuthViewModel()
     
     init() {
         FirebaseApp.configure()
@@ -34,7 +34,7 @@ struct Shelf_App_BACS488App: App {
             //NavigationView {
                 ContentView()
                 //.environment(\.managedObjectContext, persistenceController.container.viewContext)
-                    .environmentObject(viewModel)
+                    .environmentObject(authViewModel)
             }
         //}
     }
