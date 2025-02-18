@@ -135,7 +135,7 @@ class AuthViewModel: ObservableObject {
     }
     
     
-    func deleteCollection(_ collection: BookCollection) async {
+    func deleteCollection(collection: BookCollection, deleteBooks: Bool) async {
         guard let userID = Auth.auth().currentUser?.uid else {
             print("DEBUG: No authenticated user found.")
             return
@@ -153,6 +153,16 @@ class AuthViewModel: ObservableObject {
             .document(collectionID)
 
         do {
+            if deleteBooks {
+                // ✅ Delete all books inside the collection
+                let booksRef = collectionRef.collection("books")
+                let booksSnapshot = try await booksRef.getDocuments()
+                for document in booksSnapshot.documents {
+                    try await booksRef.document(document.documentID).delete()
+                    print("DEBUG: Deleted book:", document.documentID)
+                }
+            }
+            
             try await collectionRef.delete()
             print("DEBUG: Collection successfully deleted from Firestore")
 
@@ -269,37 +279,7 @@ class AuthViewModel: ObservableObject {
             print("DEBUG: Failed to save user - \(error.localizedDescription)")
         }
     }
- /*
-    func addBookToCollection(collectionId: String, book: Book) async {
-        guard let userId = currentUser?.id else {
-            print("DEBUG: No user ID found.")
-            return
-        }
 
-        let bookRef = Firestore.firestore()
-            .collection("users")
-            .document(userId)
-            .collection("collections")
-            .document(collectionId)
-            .collection("books")
-            .document(book.id) // Use the book's ID for uniqueness
-
-        let bookData: [String: Any] = [
-            "id": book.id,
-            "title": book.title,
-            "author": book.author,
-            "isbn": book.isbn,
-            "thumbnailURL": book.thumbnailURL
-        ]
-
-        do {
-            try await bookRef.setData(bookData) // ✅ Saves book in Firestore
-            print("DEBUG: Book successfully added to collection! \(collectionId)")
-        } catch {
-            print("DEBUG: Failed to add book - \(error.localizedDescription)")
-        }
-    }
-  */
     func showBookForm(for collection: BookCollection) {
         self.selectedCollection = collection
         self.isShowingBookForm = true
@@ -316,12 +296,7 @@ class AuthViewModel: ObservableObject {
             print("DEBUG: No authenticated user found.")
             return
         }
-/*
-        guard let collectionID = collection.id else {
-            print("DEBUG: Collection ID is missing.")
-            return
-        }
-*/
+
         let db = Firestore.firestore()
         let bookRef = db.collection("users")
             .document(userID)
@@ -346,6 +321,42 @@ class AuthViewModel: ObservableObject {
 
         } catch {
             print("DEBUG: Failed to add book: \(error.localizedDescription)")
+        }
+    }
+    
+    
+    func deleteBook(collection: BookCollection, book: Book) async {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("DEBUG: No authenticated user found.")
+            return
+        }
+        
+        guard let collectionID = collection.id, let bookID = book.id else {
+            print("DEBUG: Collection ID or Book ID is missing.")
+            return
+        }
+
+        let db = Firestore.firestore()
+        let bookRef = db.collection("users")
+            .document(userID)
+            .collection("collections")
+            .document(collectionID)
+            .collection("books")
+            .document(bookID)
+
+        do {
+            try await bookRef.delete()
+            print("DEBUG: Book successfully deleted from Firestore:", book.title)
+
+            // ✅ Remove from UI state
+            DispatchQueue.main.async {
+                if let index = self.collections.firstIndex(where: { $0.id == collectionID }) {
+                    self.collections[index].books.removeAll { $0.id == bookID }
+                }
+            }
+
+        } catch {
+            print("DEBUG: Failed to delete book: \(error.localizedDescription)")
         }
     }
 }

@@ -14,6 +14,9 @@ struct CollectionDetailView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @Environment(\.presentationMode) var presentationMode
     
+    @State private var showDeleteAlert = false  // ✅ Controls delete confirmation alert
+    @State private var deleteBooks = false      // ✅ Stores user choice for deleting books
+    
     var body: some View {
         VStack {
             Text(collection.name)
@@ -35,7 +38,14 @@ struct CollectionDetailView: View {
                     }
                     .padding()
                 }
-                //.onDelete(perform: deleteBook)
+                .onDelete { indexSet in
+                    for index in indexSet {
+                        let book = collection.books[index]
+                        Task {
+                            await authViewModel.deleteBook(collection: collection, book: book)
+                        }
+                    }
+                }
             }
             .listStyle(InsetGroupedListStyle())
             
@@ -61,71 +71,46 @@ struct CollectionDetailView: View {
             .padding()
         }
         .navigationTitle("Books in \(collection.name)")
-        .sheet(isPresented: $authViewModel.isShowingBookForm) {
-            AddBookView().environmentObject(authViewModel) // shows the bbook form
-        }
+        
+        //.sheet(isPresented: $authViewModel.isShowingBookForm) {
+            //AddBookView().environmentObject(authViewModel) // shows the bbook form
+        //}
+        
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(role: .destructive, action: {
-                    Task {
-                        await authViewModel.deleteCollection(collection) // ✅ Now calling function in AuthViewModel
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }) {
+                Button(role: .destructive) {
+                    showDeleteAlert = true
+                    //Task {
+                    //await authViewModel.deleteCollection(collection) // ✅ Now calling function in AuthViewModel
+                    //presentationMode.wrappedValue.dismiss()
+                    //}
+                    //})
+                } label: {
                     Label("Delete", systemImage: "trash")
                 }
             }
         }
+        .alert("Delete Collection", isPresented: $showDeleteAlert) {
+            Button("Delete Collection & Books", role: .destructive) {
+                deleteBooks = true
+                Task {
+                    await authViewModel.deleteCollection(collection: collection, deleteBooks: deleteBooks)
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+            Button("Delete Collection Only", role: .destructive) {
+                deleteBooks = false
+                Task {
+                    await authViewModel.deleteCollection(collection: collection, deleteBooks: deleteBooks)
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Do you want to delete the books inside this collection as well?")
+        }
     }
     
-    // MARK: - Delete Collection
-    //private func deleteCollection() {
-    //library.removeCollection(collection)
-    //presentationMode.wrappedValue.dismiss()
-    //}
-    /*
-     private func deleteCollection() {
-     guard let userID = Auth.auth().currentUser?.uid else {
-     print("DEBUG: No authenticated user found.")
-     return
-     }
-     
-     guard let collectionID = collection.id else {
-     print("DEBUG: Collection ID is missing.")
-     return
-     }
-     
-     let db = Firestore.firestore()
-     let collectionRef = db.collection("users")
-     .document(userID)
-     .collection("collections")
-     .document(collectionID)
-     
-     collectionRef.delete { error in
-     if let error = error {
-     print("Error deleting collection: \(error.localizedDescription)")
-     } else {
-     print("Collection successfully deleted from Firestore")
-     DispatchQueue.main.async {
-     // Remove from local app state
-     if let index = library.collections.firstIndex(where: { $0.id == collectionID }) {
-     library.collections.remove(at: index)
-     }
-     
-     presentationMode.wrappedValue.dismiss() // Navigate back
-     }
-     }
-     }
-     }
-     
-     */
-     /*
-     // MARK: - Delete Book
-     private func deleteBook(at offsets: IndexSet) {
-         collection.books.remove(atOffsets: offsets)
-         library.save()
-     }
-     */
      // MARK: - Add Book Manually
      private func addBookManually() {
          authViewModel.showBookForm(for: collection)
