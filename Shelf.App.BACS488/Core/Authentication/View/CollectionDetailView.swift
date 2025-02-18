@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseFirestore
+import FirebaseAuth
 
 struct CollectionDetailView: View {
     @ObservedObject var collection: BookCollection  // Now works because BookCollection is ObservableObject
@@ -76,17 +77,30 @@ struct CollectionDetailView: View {
     //}
 
     private func deleteCollection() {
-        guard let collectionID = collection.id else { return } // Ensure collection has an ID
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("DEBUG: No authenticated user found.")
+            return
+        }
+        
+        guard let collectionID = collection.id else {
+            print("DEBUG: Collection ID is missing.")
+            return
+        }
 
         let db = Firestore.firestore()
-        db.collection("collections").document(collectionID).delete { error in
+        let collectionRef = db.collection("users")
+            .document(userID)
+            .collection("collections")
+            .document(collectionID)
+
+        collectionRef.delete { error in
             if let error = error {
                 print("Error deleting collection: \(error.localizedDescription)")
             } else {
                 print("Collection successfully deleted from Firestore")
                 DispatchQueue.main.async {
                     library.removeCollection(collection) // Remove from local state
-                    presentationMode.wrappedValue.dismiss() // Return to home screen
+                    presentationMode.wrappedValue.dismiss() // Navigate back
                 }
             }
         }
