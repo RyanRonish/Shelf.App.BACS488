@@ -38,9 +38,14 @@ struct ISBNScannerView: UIViewControllerRepresentable {
             }
 
             let image = scan.imageOfPage(at: 0)
-            processImage(image)
 
-            controller.dismiss(animated: true)
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.processImage(image) // ✅ Process image in background
+            }
+
+            DispatchQueue.main.async {
+                controller.dismiss(animated: true)
+            }
         }
 
         func processImage(_ image: UIImage) {
@@ -52,15 +57,19 @@ struct ISBNScannerView: UIViewControllerRepresentable {
                     return
                 }
 
-                let recognizedTexts = request.results as? [VNRecognizedTextObservation]
-                let isbnCandidates = recognizedTexts?.compactMap { $0.topCandidates(1).first?.string }
+                guard let recognizedTexts = request.results as? [VNRecognizedTextObservation] else {
+                    print("DEBUG: No recognized text found.")
+                    return
+                }
 
-                if let isbn = isbnCandidates?.first(where: { $0.count == 10 || $0.count == 13 }) {
+                let isbnCandidates = recognizedTexts.compactMap { $0.topCandidates(1).first?.string }
+
+                if let isbn = isbnCandidates.first(where: { $0.count == 10 || $0.count == 13 }) {
                     DispatchQueue.main.async {
                         self.fetchBookDetails(isbn: isbn)
                     }
                 } else {
-                    print("No valid ISBN found")
+                    print("DEBUG: No valid ISBN found.")
                 }
             }
 
@@ -71,7 +80,7 @@ struct ISBNScannerView: UIViewControllerRepresentable {
                 do {
                     try handler.perform([request])
                 } catch {
-                    print("Failed to process image: \(error)")
+                    print("DEBUG: Failed to process image: \(error)")
                 }
             }
         }
