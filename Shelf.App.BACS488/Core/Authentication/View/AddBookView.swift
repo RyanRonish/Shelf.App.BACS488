@@ -67,7 +67,7 @@ struct AddBookView: View {
         )
 
         Task {
-            await authViewModel.addBookToCollection(collectionId: collection.id ?? "", book: newBook)
+            await authViewModel.addBookToCollection(collection: collection, book: newBook)
             print("DEBUG: Book added manually to collection \(collection.name)")
             presentationMode.wrappedValue.dismiss()
         }
