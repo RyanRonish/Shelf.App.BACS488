@@ -61,6 +61,9 @@ struct CollectionDetailView: View {
             .padding()
         }
         .navigationTitle("Books in \(collection.name)")
+        .sheet(isPresented: $authViewModel.isShowingBookForm) {
+            AddBookView().environmentObject(authViewModel) // shows the bbook form
+        }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(role: .destructive, action: {

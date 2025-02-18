@@ -269,7 +269,7 @@ class AuthViewModel: ObservableObject {
             print("DEBUG: Failed to save user - \(error.localizedDescription)")
         }
     }
-    
+ /*
     func addBookToCollection(collectionId: String, book: Book) async {
         guard let userId = currentUser?.id else {
             print("DEBUG: No user ID found.")
@@ -299,7 +299,7 @@ class AuthViewModel: ObservableObject {
             print("DEBUG: Failed to add book - \(error.localizedDescription)")
         }
     }
-    
+  */
     func showBookForm(for collection: BookCollection) {
         self.selectedCollection = collection
         self.isShowingBookForm = true
@@ -308,5 +308,44 @@ class AuthViewModel: ObservableObject {
     
     func scanBook(for collection: BookCollection) {
         print("DEBUG: Scanning book for collection:", collection.name)
+    }
+    
+    
+    func addBookToCollection(collection: BookCollection, book: Book) async {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("DEBUG: No authenticated user found.")
+            return
+        }
+
+        guard let collectionID = collection.id else {
+            print("DEBUG: Collection ID is missing.")
+            return
+        }
+
+        let db = Firestore.firestore()
+        let bookRef = db.collection("users")
+            .document(userID)
+            .collection("collections")
+            .document(collectionID)
+            .collection("books")
+            .document() // Firestore auto-generates book ID
+
+        var newBook = book
+        newBook.id = bookRef.documentID // Assign Firestore ID
+
+        do {
+            try await bookRef.setData(from: newBook)
+            print("DEBUG: Book successfully added to collection:", collectionID)
+
+            // ✅ Update local UI state
+            DispatchQueue.main.async {
+                if let index = self.collections.firstIndex(where: { $0.id == collectionID }) {
+                    self.collections[index].books.append(newBook)
+                }
+            }
+
+        } catch {
+            print("DEBUG: Failed to add book: \(error.localizedDescription)")
+        }
     }
 }
