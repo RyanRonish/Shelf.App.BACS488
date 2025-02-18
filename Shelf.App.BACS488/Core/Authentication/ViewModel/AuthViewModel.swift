@@ -102,14 +102,15 @@ class AuthViewModel: ObservableObject {
         guard let uid = Auth.auth().currentUser?.uid else { return }
 
         let newCollection = BookCollection(name: name, books: [])
-        let collectionRef = Firestore.firestore()
+        let newCollectionRef = Firestore.firestore()
             .collection("users")
             .document(uid)
             .collection("collections")
             .document()
 
         do {
-            try await collectionRef.setData(from: newCollection)
+            try await newCollectionRef.setData(from: newCollection)
+            print("DEBUG: Collection successfully added with ID:", newCollectionRef.documentID)
             await fetchUserCollections()
         } catch {
             print("DEBUG: Failed to add collection: \(error.localizedDescription)")

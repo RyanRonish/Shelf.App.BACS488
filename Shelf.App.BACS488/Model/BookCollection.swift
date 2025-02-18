@@ -9,6 +9,7 @@ import Foundation
 import FirebaseFirestore
 import SwiftUI
 
+
 class BookCollection: ObservableObject, Identifiable, Codable {
     @DocumentID var id: String?  // Use a String ID to align with Firestore document IDs
     @Published var name: String
@@ -39,23 +40,3 @@ class BookCollection: ObservableObject, Identifiable, Codable {
     }
 }
 
-/*
-class BookCollection: ObservableObject, Identifiable {
-    let id = UUID()  // Unique identifier for each collection
-    @Published var name: String
-    @Published var books: [Book]
-
-    init(name: String, books: [Book] = []) {
-        self.name = name
-        self.books = books
-    }
-}
- */
-
-/*
-struct BookCollection: Identifiable, Codable {
-    @DocumentID var id: String?
-    let name: String
-    var books: [Book] = []
-}
-*/
