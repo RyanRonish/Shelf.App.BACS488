@@ -104,7 +104,7 @@ class AuthViewModel: ObservableObject {
                     collection?.id = doc.documentID // ✅ Manually assign the Firestore ID
                     return collection
                 }
-                print("DEBUG: Fetched \(self.collections.count) collections from Firestore")
+                print("DEBUG: Refreshed UI - Fetched \(self.collections.count) collections from Firestore")
             }
         }
     }
@@ -159,18 +159,13 @@ class AuthViewModel: ObservableObject {
                 let booksSnapshot = try await booksRef.getDocuments()
                 for document in booksSnapshot.documents {
                     try await booksRef.document(document.documentID).delete()
-                    print("DEBUG: Deleted book:", document.documentID)
                 }
             }
             
             try await collectionRef.delete()
             print("DEBUG: Collection successfully deleted from Firestore")
 
-            // ✅ Remove from local UI state
-            DispatchQueue.main.async {
-                self.collections.removeAll { $0.id == collectionID }
-                print("DEBUG: Remaining collections in UI:", self.collections.map { $0.name })
-            }
+            await fetchUserCollections()
 
         } catch {
             print("DEBUG: Error deleting collection: \(error.localizedDescription)")
@@ -350,8 +345,8 @@ class AuthViewModel: ObservableObject {
 
             // ✅ Remove from UI state
             DispatchQueue.main.async {
-                if let index = self.collections.firstIndex(where: { $0.id == collectionID }) {
-                    self.collections[index].books.removeAll { $0.id == bookID }
+                if let collectionIndex = self.collections.firstIndex(where: { $0.id == collectionID }) {
+                    self.collections[collectionIndex].books.removeAll { $0.id == bookID }
                 }
             }
 
