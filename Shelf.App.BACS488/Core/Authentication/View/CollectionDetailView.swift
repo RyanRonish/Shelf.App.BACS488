@@ -79,6 +79,15 @@ struct CollectionDetailView: View {
             //AddBookView().environmentObject(authViewModel) // shows the bbook form
         //}
         
+        .onChange(of: authViewModel.scannedBook) { newBook in
+            if let book = newBook {
+                Task {
+                    await authViewModel.addBookToCollection(collection: collection, book: book)
+                    authViewModel.scannedBook = nil // ✅ Reset after adding
+                }
+            }
+        }
+        
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(role: .destructive) {
@@ -124,9 +133,11 @@ struct CollectionDetailView: View {
      }
      
      // MARK: - Scan Book
-     private func scanBook() {
-         authViewModel.scanBook(for: collection)
-     }
+    //scan button functionality
+    private func scanBook() {
+        authViewModel.selectedCollection = collection // ✅ Ensure the correct collection is selected
+        authViewModel.isShowingScanner = true        // ✅ Trigger the scanner
+    }
 }
 
     
