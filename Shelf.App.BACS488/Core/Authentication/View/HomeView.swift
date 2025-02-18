@@ -16,7 +16,7 @@ struct HomeView: View {
         NavigationView {
             VStack {
                 // Title
-                Text("My Book Collections")
+                Text("My Shelfs")
                     .font(.largeTitle)
                     .bold()
                     .padding(.top)
@@ -35,7 +35,7 @@ struct HomeView: View {
                 Button(action: { showAddCollectionSheet = true }) {
                     HStack {
                         Image(systemName: "plus.circle.fill")
-                        Text("Add Collection")
+                        Text("Add Shelf")
                             .fontWeight(.bold)
                     }
                     .foregroundColor(.white)
