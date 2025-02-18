@@ -75,28 +75,10 @@ struct CollectionDetailView: View {
         }
         .navigationTitle("Books in \(collection.name)")
         
-        //.sheet(isPresented: $authViewModel.isShowingBookForm) {
-            //AddBookView().environmentObject(authViewModel) // shows the bbook form
-        //}
-        
-        .onChange(of: authViewModel.scannedBook) { newBook in
-            if let book = newBook {
-                Task {
-                    await authViewModel.addBookToCollection(collection: collection, book: book)
-                    authViewModel.scannedBook = nil // ✅ Reset after adding
-                }
-            }
-        }
-        
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(role: .destructive) {
                     showDeleteAlert = true
-                    //Task {
-                    //await authViewModel.deleteCollection(collection) // ✅ Now calling function in AuthViewModel
-                    //presentationMode.wrappedValue.dismiss()
-                    //}
-                    //})
                 } label: {
                     Label("Delete", systemImage: "trash")
                 }
@@ -125,6 +107,16 @@ struct CollectionDetailView: View {
         .sheet(isPresented: $authViewModel.isShowingBookForm) {
             AddBookView().environmentObject(authViewModel) // ✅ Displays Add Book Form
         }
+        
+        .onChange(of: authViewModel.scannedBook) { newBook in
+            if let book = newBook {
+                Task {
+                    await authViewModel.addBookToCollection(collection: collection, book: book)
+                    authViewModel.scannedBook = nil // ✅ Reset after adding
+                }
+            }
+        }
+        
     }
     
      // MARK: - Add Book Manually
