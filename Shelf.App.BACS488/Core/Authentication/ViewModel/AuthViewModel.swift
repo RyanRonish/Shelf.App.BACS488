@@ -291,15 +291,15 @@ class AuthViewModel: ObservableObject {
     }
     
     
-    func addBookToCollection(collectionId: String, book: Book) async {
-        guard let userID = Auth.auth().currentUser?.uid else {
-            print("DEBUG: No authenticated user found.")
+    func addBookToCollection(collection: BookCollection, book: Book) async {
+        guard let collectionId = collection.id else {
+            print("DEBUG: Collection ID not found.")
             return
         }
 
         let db = Firestore.firestore()
         let bookRef = db.collection("users")
-            .document(userID)
+            .document(Auth.auth().currentUser?.uid ?? "")
             .collection("collections")
             .document(collectionId)
             .collection("books")
@@ -310,7 +310,7 @@ class AuthViewModel: ObservableObject {
 
         do {
             try await bookRef.setData(from: newBook)
-            print("DEBUG: Book successfully added to collection:", collectionId)
+            print("DEBUG: Book successfully added to collection:", collection.name)
 
             // ✅ Update local UI state
             DispatchQueue.main.async {

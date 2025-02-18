@@ -52,7 +52,10 @@ struct CollectionDetailView: View {
             Spacer()
             
             HStack {
-                Button(action: addBookManually) {
+                Button(action: {
+                    authViewModel.selectedCollection = collection // ✅ Ensure the correct collection is selected
+                    authViewModel.isShowingBookForm = true        // ✅ Trigger form display
+                }) {
                     Label("Add Book", systemImage: "plus")
                         .padding()
                         .background(Color.blue)
@@ -108,6 +111,10 @@ struct CollectionDetailView: View {
             Button("Cancel", role: .cancel) { }
         } message: {
             Text("Do you want to delete the books inside this collection as well?")
+        }
+        
+        .sheet(isPresented: $authViewModel.isShowingBookForm) {
+            AddBookView().environmentObject(authViewModel) // ✅ Displays Add Book Form
         }
     }
     
