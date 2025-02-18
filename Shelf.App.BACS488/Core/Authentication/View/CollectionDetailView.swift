@@ -11,7 +11,7 @@ import FirebaseAuth
 
 struct CollectionDetailView: View {
     @ObservedObject var collection: BookCollection  // Now works because BookCollection is ObservableObject
-    @EnvironmentObject var library: Library
+    @EnvironmentObject var authViewModel: AuthViewModel
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -35,7 +35,7 @@ struct CollectionDetailView: View {
                     }
                     .padding()
                 }
-                .onDelete(perform: deleteBook)
+                //.onDelete(perform: deleteBook)
             }
             .listStyle(InsetGroupedListStyle())
             
@@ -65,7 +65,7 @@ struct CollectionDetailView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(role: .destructive, action: {
                     Task {
-                        await AuthViewModel.deleteCollection(collection) // ✅ Now calling function in AuthViewModel
+                        await authViewModel.deleteCollection(collection) // ✅ Now calling function in AuthViewModel
                         presentationMode.wrappedValue.dismiss()
                     }
                 }) {
@@ -125,12 +125,12 @@ struct CollectionDetailView: View {
      */
      // MARK: - Add Book Manually
      private func addBookManually() {
-         library.showBookForm(for: collection)
+         authViewModel.showBookForm(for: collection)
      }
      
      // MARK: - Scan Book
      private func scanBook() {
-         library.scanBook(for: collection)
+         authViewModel.scanBook(for: collection)
      }
 }
 

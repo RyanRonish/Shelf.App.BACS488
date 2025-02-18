@@ -23,6 +23,8 @@ class AuthViewModel: ObservableObject {
     @Published var userSession: FirebaseAuth.User?
     @Published var currentUser: User?
     @Published var collections: [BookCollection] = []  // ✅ Stores user collections
+    @Published var selectedCollection: BookCollection? // ✅ Stores the selected collection for book form
+    @Published var isShowingBookForm: Bool = false    // ✅ Controls UI state for book form
 
     init() {
         self.userSession = Auth.auth().currentUser
@@ -296,5 +298,15 @@ class AuthViewModel: ObservableObject {
         } catch {
             print("DEBUG: Failed to add book - \(error.localizedDescription)")
         }
+    }
+    
+    func showBookForm(for collection: BookCollection) {
+        self.selectedCollection = collection
+        self.isShowingBookForm = true
+        print("DEBUG: Showing book form for collection:", collection.name)
+    }
+    
+    func scanBook(for collection: BookCollection) {
+        print("DEBUG: Scanning book for collection:", collection.name)
     }
 }
