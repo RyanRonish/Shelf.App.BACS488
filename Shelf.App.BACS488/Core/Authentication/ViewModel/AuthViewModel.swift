@@ -91,21 +91,35 @@ class AuthViewModel: ObservableObject {
             return
         }
 
-        let snapshot = try? await Firestore.firestore()
-            .collection("users")
-            .document(uid)
-            .collection("collections")
-            .getDocuments()
+        let db = Firestore.firestore()
+        let userCollectionsRef = db.collection("users").document(uid).collection("collections")
 
-        DispatchQueue.main.async {
-            if let documents = snapshot?.documents {
-                self.collections = documents.compactMap { doc in
-                    var collection = try? doc.data(as: BookCollection.self)
-                    collection?.id = doc.documentID // ✅ Manually assign the Firestore ID
-                    return collection
+        do {
+            let collectionsSnapshot = try await userCollectionsRef.getDocuments()
+
+            var loadedCollections: [BookCollection] = []
+            
+            for document in collectionsSnapshot.documents {
+                var collection = try? document.data(as: BookCollection.self)
+                collection?.id = document.documentID
+
+                if let collection = collection {
+                    let booksRef = userCollectionsRef.document(collection.id!).collection("books")
+                    let booksSnapshot = try await booksRef.getDocuments()
+
+                    collection.books = booksSnapshot.documents.compactMap { try? $0.data(as: Book.self) }
+
+                    loadedCollections.append(collection)
                 }
-                print("DEBUG: Refreshed UI - Fetched \(self.collections.count) collections from Firestore")
             }
+
+            DispatchQueue.main.async {
+                self.collections = loadedCollections
+                print("DEBUG: Refreshed UI - Loaded \(self.collections.count) collections with books")
+            }
+
+        } catch {
+            print("DEBUG: Error fetching collections - \(error.localizedDescription)")
         }
     }
 
@@ -159,6 +173,7 @@ class AuthViewModel: ObservableObject {
                 let booksSnapshot = try await booksRef.getDocuments()
                 for document in booksSnapshot.documents {
                     try await booksRef.document(document.documentID).delete()
+                    print("DEBUG: Deleted book:", document.documentID)
                 }
             }
             
@@ -287,6 +302,11 @@ class AuthViewModel: ObservableObject {
     
     
     func addBookToCollection(collection: BookCollection, book: Book) async {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("DEBUG: No authenticated user found.")
+            return
+        }
+        
         guard let collectionId = collection.id else {
             print("DEBUG: Collection ID not found.")
             return
@@ -307,12 +327,7 @@ class AuthViewModel: ObservableObject {
             try await bookRef.setData(from: newBook)
             print("DEBUG: Book successfully added to collection:", collection.name)
 
-            // ✅ Update local UI state
-            DispatchQueue.main.async {
-                if let index = self.collections.firstIndex(where: { $0.id == collectionId }) {
-                    self.collections[index].books.append(newBook)
-                }
-            }
+            await fetchUserCollections() 
 
         } catch {
             print("DEBUG: Failed to add book: \(error.localizedDescription)")
@@ -343,12 +358,7 @@ class AuthViewModel: ObservableObject {
             try await bookRef.delete()
             print("DEBUG: Book successfully deleted from Firestore:", book.title)
 
-            // ✅ Remove from UI state
-            DispatchQueue.main.async {
-                if let collectionIndex = self.collections.firstIndex(where: { $0.id == collectionID }) {
-                    self.collections[collectionIndex].books.removeAll { $0.id == bookID }
-                }
-            }
+            await fetchUserCollections()
 
         } catch {
             print("DEBUG: Failed to delete book: \(error.localizedDescription)")
