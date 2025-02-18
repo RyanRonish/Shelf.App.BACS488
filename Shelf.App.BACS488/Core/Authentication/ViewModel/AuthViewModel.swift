@@ -311,22 +311,22 @@ class AuthViewModel: ObservableObject {
     }
     
     
-    func addBookToCollection(collection: BookCollection, book: Book) async {
+    func addBookToCollection(collectionId: String, book: Book) async {
         guard let userID = Auth.auth().currentUser?.uid else {
             print("DEBUG: No authenticated user found.")
             return
         }
-
+/*
         guard let collectionID = collection.id else {
             print("DEBUG: Collection ID is missing.")
             return
         }
-
+*/
         let db = Firestore.firestore()
         let bookRef = db.collection("users")
             .document(userID)
             .collection("collections")
-            .document(collectionID)
+            .document(collectionId)
             .collection("books")
             .document() // Firestore auto-generates book ID
 
@@ -335,11 +335,11 @@ class AuthViewModel: ObservableObject {
 
         do {
             try await bookRef.setData(from: newBook)
-            print("DEBUG: Book successfully added to collection:", collectionID)
+            print("DEBUG: Book successfully added to collection:", collectionId)
 
             // ✅ Update local UI state
             DispatchQueue.main.async {
-                if let index = self.collections.firstIndex(where: { $0.id == collectionID }) {
+                if let index = self.collections.firstIndex(where: { $0.id == collectionId }) {
                     self.collections[index].books.append(newBook)
                 }
             }
