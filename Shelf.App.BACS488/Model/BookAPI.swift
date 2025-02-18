@@ -11,38 +11,44 @@ class BookAPI {
     static let shared = BookAPI()
 
     func fetchBookDetails(isbn: String, completion: @escaping (Book?) -> Void) {
-        let apiUrl = "https://www.googleapis.com/books/v1/volumes?q=isbn:\(isbn)"
+        let urlString = "https://www.googleapis.com/books/v1/volumes?q=isbn:\(isbn)"
 
-        guard let url = URL(string: apiUrl) else {
+        guard let url = URL(string: urlString) else {
             print("Invalid API URL")
             completion(nil)
             return
         }
 
         URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, error == nil else {
-                print("Error fetching book data:", error?.localizedDescription ?? "Unknown error")
+            if let error = error {
+                print("DEBUG: API request failed - \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            
+            guard let data = data else {
+                print("DEBUG: No data received")
                 completion(nil)
                 return
             }
 
             do {
-                let jsonResponse = try JSONDecoder().decode(GoogleBooksResponse.self, from: data)
+                let decodedResponse = try JSONDecoder().decode(GoogleBooksResponse.self, from: data)
 
-                if let bookItem = jsonResponse.items?.first {
+                if let bookInfo = decodedResponse.items?.first?.volumeInfo {
                     let book = Book(
-                        id: bookItem.id,
-                        title: bookItem.volumeInfo.title,
-                        author: bookItem.volumeInfo.authors?.first ?? "Unknown",
+                        id: UUID().uuidString,
+                        title: bookInfo.title ?? "Unknown Title",
+                        author: bookInfo.authors?.joined(separator: ", ") ?? "Unknown Author",
                         isbn: isbn,
-                        thumbnailURL: bookItem.volumeInfo.imageLinks?.thumbnail ?? "https://example.com/default-thumbnail.jpg"
+                        thumbnailURL: bookInfo.imageLinks?.thumbnail
                     )
                     completion(book)
                 } else {
                     completion(nil)
                 }
             } catch {
-                print("Error decoding JSON:", error.localizedDescription)
+                print("Error decoding JSON: - \(error.localizedDescription)")
                 completion(nil)
             }
         }.resume()
@@ -50,22 +56,21 @@ class BookAPI {
 }
 
 // Structs to decode Google Books API response
-struct GoogleBooksResponse: Decodable {
-    let items: [GoogleBookItem]?
+struct GoogleBooksResponse: Codable {
+    let items: [BookItem]?
 }
 
-struct GoogleBookItem: Decodable {
-    let id: String
-    let volumeInfo: VolumeInfo
+struct BookItem: Codable {
+    let volumeInfo: BookInfo
 }
 
-struct VolumeInfo: Decodable {
+struct BookInfo: Codable {
     let title: String
     let authors: [String]?
     let imageLinks: ImageLinks?
 }
 
-struct ImageLinks: Decodable {
+struct ImageLinks: Codable {
     let thumbnail: String?
 }
 

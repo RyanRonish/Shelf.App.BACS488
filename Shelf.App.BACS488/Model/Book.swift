@@ -8,19 +8,20 @@
 import Foundation
 import FirebaseFirestore
 
-struct Book: Identifiable, Codable {
-    @DocumentID var id: String?
-    var title: String
-    var author: String
-    var isbn: String?
-    var thumbnailURL: String?
+struct Book: Identifiable, Codable, Equatable {
+    let id: String?
+    let title: String
+    let author: String
+    let isbn: String?
+    let thumbnailURL: String?
 
-    init(id: String = UUID().uuidString, title: String, author: String, isbn: String? = nil, thumbnailURL: String? = nil) {
-        self.id = id
-        self.title = title
-        self.author = author
-        self.isbn = isbn
-        self.thumbnailURL = thumbnailURL
+    // ✅ Implement Equatable Protocol
+    static func == (lhs: Book, rhs: Book) -> Bool {
+        return lhs.id == rhs.id &&
+               lhs.title == rhs.title &&
+               lhs.author == rhs.author &&
+               lhs.isbn == rhs.isbn &&
+               lhs.thumbnailURL == rhs.thumbnailURL
     }
 }
 

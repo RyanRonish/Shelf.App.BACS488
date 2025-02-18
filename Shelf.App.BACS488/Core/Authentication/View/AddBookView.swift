@@ -19,6 +19,18 @@ struct AddBookView: View {
     var body: some View {
         NavigationView {
             Form {
+                // Scan Button
+                Section {
+                    Button(action: {
+                        authViewModel.isShowingScanner = true
+                    }) {
+                        HStack {
+                            Image(systemName: "barcode.viewfinder")
+                            Text("Scan ISBN")
+                        }
+                        .foregroundColor(.blue)
+                    }
+                }
                 // 📌 Book Details
                 Section(header: Text("Book Details")) {
                     TextField("Title", text: $title)
@@ -49,6 +61,18 @@ struct AddBookView: View {
                 }
             }
         }
+        .sheet(isPresented: $authViewModel.isShowingScanner) {
+            ISBNScannerView(scannedBook: $authViewModel.scannedBook)
+        }
+        .onChange(of: authViewModel.scannedBook) { newBook in
+            if let newBook {
+                title = newBook.title
+                author = newBook.author
+                isbn = newBook.isbn ?? ""
+                thumbnailURL = newBook.thumbnailURL ?? ""
+                authViewModel.scannedBook = nil // Reset after setting fields
+            }
+        }
     }
 
     // 📌 Function to Add the Book
@@ -60,6 +84,7 @@ struct AddBookView: View {
         }
 
         let newBook = Book(
+            id: UUID().uuidString, // ✅ Generate a unique ID
             title: title,
             author: author,
             isbn: isbn.isEmpty ? nil : isbn,
@@ -68,7 +93,6 @@ struct AddBookView: View {
 
         Task {
             await authViewModel.addBookToCollection(collection: collection, book: newBook)
-            print("DEBUG: Book added manually to collection \(collection.name)")
             presentationMode.wrappedValue.dismiss()
         }
     }

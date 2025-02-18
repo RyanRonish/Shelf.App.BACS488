@@ -25,6 +25,9 @@ class AuthViewModel: ObservableObject {
     @Published var collections: [BookCollection] = []  // ✅ Stores user collections
     @Published var selectedCollection: BookCollection? // ✅ Stores the selected collection for book form
     @Published var isShowingBookForm: Bool = false    // ✅ Controls UI state for book form
+    
+    @Published var scannedBook: Book? // Stores the scanned book details
+    @Published var isShowingScanner = false // Controls when the scanner is active
 
     init() {
         self.userSession = Auth.auth().currentUser
@@ -327,7 +330,7 @@ class AuthViewModel: ObservableObject {
             try await bookRef.setData(from: newBook)
             print("DEBUG: Book successfully added to collection:", collection.name)
 
-            await fetchUserCollections() 
+            await fetchUserCollections()
 
         } catch {
             print("DEBUG: Failed to add book: \(error.localizedDescription)")
