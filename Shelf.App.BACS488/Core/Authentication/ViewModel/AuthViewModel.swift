@@ -323,8 +323,13 @@ class AuthViewModel: ObservableObject {
             .collection("books")
             .document() // Firestore auto-generates book ID
 
-        var newBook = book
-        newBook.id = bookRef.documentID // Assign Firestore ID
+        let newBook = Book(
+            id: bookRef.documentID, // ✅ Assign Firestore ID during creation
+            title: book.title,
+            author: book.author,
+            isbn: book.isbn,
+            thumbnailURL: book.thumbnailURL
+        )
 
         do {
             try await bookRef.setData(from: newBook)

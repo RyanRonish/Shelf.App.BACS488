@@ -9,7 +9,7 @@ import Foundation
 import FirebaseFirestore
 
 struct Book: Identifiable, Codable, Equatable {
-    let id: String?
+    var id: String?
     let title: String
     let author: String
     let isbn: String?
