@@ -95,29 +95,24 @@ class AuthViewModel: ObservableObject {
         }
 
         let db = Firestore.firestore()
-        let userCollectionsRef = db.collection("users").document(uid).collection("collections")
+        let userCollectionsRef = db.collection("collections")
+            .whereField("ownerId", isEqualTo: uid)
 
         do {
-            let collectionsSnapshot = try await userCollectionsRef
-                .whereField("ownerId", isEqualTo: uid)
-                .getDocuments()
-
+            let collectionsSnapshot = try await userCollectionsRef.getDocuments()
             var loadedCollections: [BookCollection] = []
-            
+
             for document in collectionsSnapshot.documents {
                 var collection = try? document.data(as: BookCollection.self)
                 collection?.id = document.documentID
 
                 if let collection = collection {
-                    let booksRef = userCollectionsRef.document(collection.id!).collection("books")
+                    let booksRef = db.collection("collections").document(collection.id!).collection("books")
                     let booksSnapshot = try await booksRef.getDocuments()
-
                     collection.books = booksSnapshot.documents.compactMap { try? $0.data(as: Book.self) }
-
                     loadedCollections.append(collection)
                 }
             }
-
             DispatchQueue.main.async {
                 self.collections = loadedCollections
                 print("DEBUG: Refreshed UI - Loaded \(self.collections.count) collections with books")
@@ -145,7 +140,13 @@ class AuthViewModel: ObservableObject {
         newCollection.id = newCollectionRef.documentID
 
         do {
-            try await newCollectionRef.setData(from: newCollection)
+            try await newCollectionRef.setData([
+                "id": newCollection.id ?? "",
+                "name": newCollection.name,
+                "ownerId": uid,
+                "books": []
+            ])
+            
             print("DEBUG: Collection successfully added with ID:", newCollection.id ?? "No ID")
             await fetchUserCollections()
         } catch {

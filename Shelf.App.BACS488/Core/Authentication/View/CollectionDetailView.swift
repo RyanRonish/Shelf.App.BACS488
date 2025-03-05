@@ -133,13 +133,15 @@ struct CollectionDetailView: View {
 }
 
     
-    
+
     #Preview {
         CollectionDetailView(collection: BookCollection(
             name: "Favorites",
+            ownerId: "testUser123",
             books: [
                 Book(title: "The Hobbit", author: "J.R.R. Tolkien", isbn: "isbn", thumbnailURL: "https://example.com/default-thumbnail.jpg"),
                 Book(title: "1984", author: "George Orwell", isbn: "isbn", thumbnailURL: "https://example.com/default-thumbnail.jpg")
             ]
         ))
     }
+
