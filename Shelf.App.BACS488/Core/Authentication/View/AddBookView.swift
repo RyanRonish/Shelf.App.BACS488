@@ -70,6 +70,7 @@ struct AddBookView: View {
                 author = newBook.author
                 isbn = newBook.isbn ?? ""
                 thumbnailURL = newBook.thumbnailURL ?? ""
+                
                 authViewModel.scannedBook = nil // Reset after setting fields
             }
         }

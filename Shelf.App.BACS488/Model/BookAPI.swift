@@ -14,20 +14,20 @@ class BookAPI {
         let urlString = "https://www.googleapis.com/books/v1/volumes?q=isbn:\(isbn)"
 
         guard let url = URL(string: urlString) else {
-            print("Invalid API URL")
+            print("❌ DEBUG: Invalid Google Books API URL")
             completion(nil)
             return
         }
 
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
-                print("DEBUG: API request failed - \(error.localizedDescription)")
+                print("❌ DEBUG: API request failed - \(error.localizedDescription)")
                 completion(nil)
                 return
             }
             
             guard let data = data else {
-                print("DEBUG: No data received")
+                print("❌ DEBUG: No data received")
                 completion(nil)
                 return
             }
@@ -45,10 +45,11 @@ class BookAPI {
                     )
                     completion(book)
                 } else {
+                    print("❌ DEBUG: No books found for ISBN: \(isbn)")
                     completion(nil)
                 }
             } catch {
-                print("Error decoding JSON: - \(error.localizedDescription)")
+                print("❌ Error decoding JSON: \(error.localizedDescription)")
                 completion(nil)
             }
         }.resume()

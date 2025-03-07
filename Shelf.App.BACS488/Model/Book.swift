@@ -25,13 +25,4 @@ struct Book: Identifiable, Codable, Equatable {
     }
 }
 
-/*
-struct Book: Identifiable, Codable {
-   // @DocumentID var id: String?
-    let id = UUID()
-    let title: String
-    let author: String
-    let isbn: String
-    let thumbnailURL: String?
-}
-*/
+

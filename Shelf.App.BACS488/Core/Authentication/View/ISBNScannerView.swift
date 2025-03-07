@@ -11,19 +11,19 @@ import VisionKit
 
 struct ISBNScannerView: UIViewControllerRepresentable {
     @Binding var scannedBook: Book?
-
+    
     func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
         let scanner = VNDocumentCameraViewController()
         scanner.delegate = context.coordinator
         return scanner
     }
-
+    
     func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) {}
-
+    
     func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
-
+    
     class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
         var parent: ISBNScannerView
         
@@ -36,34 +36,34 @@ struct ISBNScannerView: UIViewControllerRepresentable {
                 controller.dismiss(animated: true)
                 return
             }
-
+            
             let image = scan.imageOfPage(at: 0)
-
+            
             DispatchQueue.global(qos: .userInitiated).async {
                 self.processImage(image) // ✅ Process image in background
             }
-
+            
             DispatchQueue.main.async {
                 controller.dismiss(animated: true)
             }
         }
-
+        
         func processImage(_ image: UIImage) {
             guard let cgImage = image.cgImage else { return }
-
+            
             let request = VNRecognizeTextRequest { request, error in
                 if let error = error {
                     print("Error recognizing text: \(error.localizedDescription)")
                     return
                 }
-
+                
                 guard let recognizedTexts = request.results as? [VNRecognizedTextObservation] else {
                     print("DEBUG: No recognized text found.")
                     return
                 }
-
+                
                 let isbnCandidates = recognizedTexts.compactMap { $0.topCandidates(1).first?.string }
-
+                
                 if let isbn = isbnCandidates.first(where: { $0.count == 10 || $0.count == 13 }) {
                     DispatchQueue.main.async {
                         self.fetchBookDetails(isbn: isbn)
@@ -72,9 +72,9 @@ struct ISBNScannerView: UIViewControllerRepresentable {
                     print("DEBUG: No valid ISBN found.")
                 }
             }
-
+            
             request.recognitionLevel = .accurate
-
+            
             let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
             DispatchQueue.global(qos: .userInitiated).async {
                 do {
@@ -84,15 +84,26 @@ struct ISBNScannerView: UIViewControllerRepresentable {
                 }
             }
         }
-
+        
         func fetchBookDetails(isbn: String) {
             BookAPI.shared.fetchBookDetails(isbn: isbn) { book in
-                DispatchQueue.main.async {
-                    self.parent.scannedBook = book
+                DispatchQueue.global(qos: .userInitiated).async {
+                    guard let book = book else {
+                        print("DEBUG: No book found for ISBN \(isbn)")
+                        return
+                    }
+                    
+                    if let collection = self.parent.authViewModel.selectedCollection {
+                        Task {
+                            await self.parent.authViewModel.addBookToCollection(collection: collection, book: book)
+                        }
+                    } else {
+                        self.parent.scannedBook = book
+                    }
                 }
             }
         }
-
+        
         func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
             controller.dismiss(animated: true)
         }
