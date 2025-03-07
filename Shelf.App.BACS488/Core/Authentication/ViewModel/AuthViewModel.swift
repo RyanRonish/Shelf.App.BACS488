@@ -108,7 +108,7 @@ class AuthViewModel: ObservableObject {
                 collection?.id = document.documentID
 
                 if let collection = collection {
-                    let booksRef = db.collection("collections").document(collection.id!).collection("books")
+                    let booksRef = userCollectionsRef.document(collection.id!).collection("books")
                     let booksSnapshot = try await booksRef.getDocuments()
                     collection.books = booksSnapshot.documents.compactMap { try? $0.data(as: Book.self) }
                     loadedCollections.append(collection)
@@ -321,7 +321,7 @@ class AuthViewModel: ObservableObject {
 
         let db = Firestore.firestore()
         let bookRef = db.collection("users")
-            .document(Auth.auth().currentUser?.uid ?? "")
+            .document(userID)
             .collection("collections")
             .document(collectionId)
             .collection("books")
