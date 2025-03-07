@@ -95,8 +95,9 @@ class AuthViewModel: ObservableObject {
         }
 
         let db = Firestore.firestore()
-        let userCollectionsRef = db.collection("collections")
-            .whereField("ownerId", isEqualTo: uid)
+        let userCollectionsRef = db.collection("users")
+            .document(uid)
+            .collection("collections")
 
         do {
             let collectionsSnapshot = try await userCollectionsRef.getDocuments()
@@ -131,9 +132,9 @@ class AuthViewModel: ObservableObject {
         }
 
         let db = Firestore.firestore()
-        let newCollectionRef = //db.collection("users")
-            //.document(uid)
-            db.collection("collections")
+        let newCollectionRef = db.collection("users")
+            .document(uid)
+            .collection("collections")
             .document()
         
         var newCollection = BookCollection(name: name, ownerId: uid)
@@ -156,10 +157,10 @@ class AuthViewModel: ObservableObject {
     
     
     func deleteCollection(collection: BookCollection, deleteBooks: Bool) async {
-        /*guard let userID = Auth.auth().currentUser?.uid else {
+        guard let userID = Auth.auth().currentUser?.uid else {
             print("DEBUG: No authenticated user found.")
             return
-        }*/
+        }
         
         guard let collectionID = collection.id else {
             print("DEBUG: Collection ID is missing.")
@@ -167,9 +168,9 @@ class AuthViewModel: ObservableObject {
         }
 
         let db = Firestore.firestore()
-        let collectionRef = //db.collection("users")
-            //.document(userID)
-            db.collection("collections")
+        let collectionRef = db.collection("users")
+            .document(userID)
+            .collection("collections")
             .document(collectionID)
 
         do {
