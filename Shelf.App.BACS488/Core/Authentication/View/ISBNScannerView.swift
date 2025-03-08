@@ -11,6 +11,7 @@ import VisionKit
 
 struct ISBNScannerView: UIViewControllerRepresentable {
     @Binding var scannedBook: Book?
+    var authViewModel: AuthViewModel
     
     func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
         let scanner = VNDocumentCameraViewController()
@@ -21,14 +22,16 @@ struct ISBNScannerView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) {}
     
     func makeCoordinator() -> Coordinator {
-        return Coordinator(self)
+        return Coordinator(self, authViewModel: authViewModel)
     }
     
     class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
         var parent: ISBNScannerView
+        var authViewModel: AuthViewModel
         
-        init(_ parent: ISBNScannerView) {
+        init(_ parent: ISBNScannerView, authViewModel: AuthViewModel) {
             self.parent = parent
+            self.authViewModel = authViewModel
         }
         
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
@@ -86,24 +89,28 @@ struct ISBNScannerView: UIViewControllerRepresentable {
         }
         
         func fetchBookDetails(isbn: String) {
-            BookAPI.shared.fetchBookDetails(isbn: isbn) { book in
-                DispatchQueue.global(qos: .userInitiated).async {
+            BookAPI.shared.fetchBookDetails(isbn: isbn, completion: { book in
+                Task {
                     guard let book = book else {
                         print("DEBUG: No book found for ISBN \(isbn)")
                         return
                     }
                     
-                    if let collection = self.parent.authViewModel.selectedCollection {
-                        Task {
-                            await self.parent.authViewModel.addBookToCollection(collection: collection, book: book)
+                    let scannedBook = book
+                    
+                    await MainActor.run {
+                        if let collection = self.parent.authViewModel.selectedCollection {
+                            Task {
+                                await self.parent.authViewModel.addBookToCollection(collection: collection, book: scannedBook)
+                            }
+                        } else {
+                            self.parent.scannedBook = scannedBook
                         }
-                    } else {
-                        self.parent.scannedBook = book
                     }
                 }
-            }
+            })
         }
-        
+                 
         func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
             controller.dismiss(animated: true)
         }
@@ -111,6 +118,6 @@ struct ISBNScannerView: UIViewControllerRepresentable {
 }
 
 #Preview {
-    ISBNScannerView(scannedBook: .constant(nil))
+    ISBNScannerView(scannedBook: .constant(nil), authViewModel: AuthViewModel())
 }
 

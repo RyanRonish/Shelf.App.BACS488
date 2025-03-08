@@ -15,7 +15,7 @@ struct AddBookView: View {
     @State private var author: String = ""
     @State private var isbn: String = ""
     @State private var thumbnailURL: String = ""
-
+    
     var body: some View {
         NavigationView {
             Form {
@@ -53,55 +53,60 @@ struct AddBookView: View {
                 }
             }
             .navigationTitle("Add Book")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
+            .toolbar(content: {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
                         presentationMode.wrappedValue.dismiss()
                     }
                 }
+                ToolbarItem(placement: .navigationBarTrailing) { // ✅ Add another button if needed
+                    Button("Save") {
+                        //saveBook()
+                    }
+                }
+            })
+            
+            .sheet(isPresented: $authViewModel.isShowingScanner) {
+                ISBNScannerView(scannedBook: $authViewModel.scannedBook, authViewModel: authViewModel)
             }
-        }
-        .sheet(isPresented: $authViewModel.isShowingScanner) {
-            ISBNScannerView(scannedBook: $authViewModel.scannedBook)
-        }
-        .onChange(of: authViewModel.scannedBook) { newBook in
-            if let newBook {
-                title = newBook.title
-                author = newBook.author
-                isbn = newBook.isbn ?? ""
-                thumbnailURL = newBook.thumbnailURL ?? ""
-                
-                authViewModel.scannedBook = nil // Reset after setting fields
+            .onChange(of: authViewModel.scannedBook) { newBook in
+                if let newBook {
+                    title = newBook.title
+                    author = newBook.author
+                    isbn = newBook.isbn ?? ""
+                    thumbnailURL = newBook.thumbnailURL ?? ""
+                    
+                    authViewModel.scannedBook = nil // Reset after setting fields
+                }
             }
         }
     }
-
-    // 📌 Function to Add the Book
+        // 📌 Function to Add the Book
     private func addBook() {
-
-        guard let collection = authViewModel.selectedCollection else {
-            print("DEBUG: No collection selected.")
-            return
-        }
-
-        let newBook = Book(
-            id: UUID().uuidString, // ✅ Generate a unique ID
-            title: title,
-            author: author,
-            isbn: isbn.isEmpty ? nil : isbn,
-            thumbnailURL: thumbnailURL.isEmpty ? nil : thumbnailURL
-        )
-
-        Task {
-            await authViewModel.addBookToCollection(collection: collection, book: newBook)
-            presentationMode.wrappedValue.dismiss()
+            
+            guard let collection = authViewModel.selectedCollection else {
+                print("DEBUG: No collection selected.")
+                return
+            }
+            
+            let newBook = Book(
+                id: UUID().uuidString, // ✅ Generate a unique ID
+                title: title,
+                author: author,
+                isbn: isbn.isEmpty ? nil : isbn,
+                thumbnailURL: thumbnailURL.isEmpty ? nil : thumbnailURL
+            )
+            
+            Task {
+                await authViewModel.addBookToCollection(collection: collection, book: newBook)
+                presentationMode.wrappedValue.dismiss()
+            }
         }
     }
-}
-
-
-#Preview {
-    AddBookView()
-}
-
+    
+    
+    #Preview {
+        AddBookView()
+    }
+    
 
