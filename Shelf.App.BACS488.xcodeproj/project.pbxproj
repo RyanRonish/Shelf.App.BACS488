@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		68C32CC42D7C11D700647D27 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 68C32CC32D7C11CB00647D27 /* README.md */; };
+		68C32CC62D7C121700647D27 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 68C32CC52D7C120700647D27 /* .gitignore */; };
 		68CED1932D4B826000409701 /* CollectionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CED1922D4B826000409701 /* CollectionDetailView.swift */; };
 		68CED1952D4B844700409701 /* BookCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CED1942D4B844700409701 /* BookCollection.swift */; };
 		68CED1972D4B84CF00409701 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CED1962D4B84CF00409701 /* Book.swift */; };
@@ -36,6 +38,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		68C32CC32D7C11CB00647D27 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		68C32CC52D7C120700647D27 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		68CED1922D4B826000409701 /* CollectionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionDetailView.swift; sourceTree = "<group>"; };
 		68CED1942D4B844700409701 /* BookCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCollection.swift; sourceTree = "<group>"; };
 		68CED1962D4B84CF00409701 /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Book.swift; sourceTree = "<group>"; };
@@ -95,6 +99,8 @@
 		68D39A1E2D4AF107004C16F6 /* Shelf.App.BACS488 */ = {
 			isa = PBXGroup;
 			children = (
+				68C32CC52D7C120700647D27 /* .gitignore */,
+				68C32CC32D7C11CB00647D27 /* README.md */,
 				68D39A412D4AF690004C16F6 /* App */,
 				68D39A3C2D4AF506004C16F6 /* Components */,
 				68D39A332D4AF461004C16F6 /* Core */,
@@ -270,7 +276,9 @@
 			files = (
 				68D39A272D4AF108004C16F6 /* Preview Assets.xcassets in Resources */,
 				68D39A492D4B2A6B004C16F6 /* GoogleService-Info.plist in Resources */,
+				68C32CC42D7C11D700647D27 /* README.md in Resources */,
 				68D39A402D4AF553004C16F6 /* Shelf.App.png in Resources */,
+				68C32CC62D7C121700647D27 /* .gitignore in Resources */,
 				68D39A242D4AF108004C16F6 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
