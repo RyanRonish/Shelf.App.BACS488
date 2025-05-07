@@ -44,39 +44,38 @@ struct CollectionDetailView: View {
     var body: some View {
         VStack {
             if appViewModel.books(in: collection).isEmpty {
-                Text("")
-                //.foregroundColor(.secondary)
-                //.padding()
+                Text("No books in this collection yet.")
+                    .foregroundColor(.gray)
+                    .padding()
             } else {
-                List(appViewModel.books(in: collection)) { book in
-                    HStack(alignment: .top) {
-                        if let urlString = book.thumbnailURL, let url = URL(string: urlString) {
-                            AsyncImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 50, height: 75)
-                                    .cornerRadius(6)
-                            } placeholder: {
-                                ProgressView()
-                            }
-                        }
-                        VStack(alignment: .leading) {
-                            Text(book.title)
-                                .font(.headline)
-                            Text(book.author)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            if let year = book.year {
-                                Text(year).font(.caption).foregroundColor(.gray)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        ForEach(0..<3) { shelfIndex in
+                            VStack(alignment: .leading) {
+                                Text("Shelf \(shelfIndex + 1)")
+                                    .font(.headline)
+                                    .padding(.leading)
+
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        ForEach(getBooksForShelf(shelf: shelfIndex), id: \.id) { book in
+                                            BookCard(book: book)
+                                                .onTapGesture {
+                                                    selectedBook = book
+                                                    showBookDetail = true
+                                                }
+                                        }
+                                    }
+                                    .padding(.horizontal)
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        .navigationTitle(collection.name)
-        .toolbar {
+            .navigationTitle(collection.name)
+            .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(role: .destructive) {
                     showDeleteConfirmation = true
@@ -118,6 +117,15 @@ struct CollectionDetailView: View {
                 .transition(.opacity)
         }
     }
+    
+    func getBooksForShelf(shelf: Int) -> [Book] {
+        let allBooks = appViewModel.books(in: collection)
+        let countPerShelf = max(allBooks.count / 3, 1)
+        let start = shelf * countPerShelf
+        let end = min(start + countPerShelf, allBooks.count)
+        return Array(allBooks[start..<end])
+    }
+    
     func ZStack() {
         VStack {
             ScrollView(.horizontal, showsIndicators: false) {
@@ -333,3 +341,29 @@ struct CollectionDetailView: View {
             }
         }
     }
+
+struct BookCard: View {
+    let book: Book
+
+    var body: some View {
+        VStack {
+            if let url = URL(string: book.thumbnailURL ?? "") {
+                AsyncImage(url: url) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 100, height: 150)
+                        .cornerRadius(8)
+                } placeholder: {
+                    ProgressView()
+                }
+            }
+
+            Text(book.title)
+                .font(.caption)
+                .frame(width: 100)
+                .lineLimit(1)
+        }
+        .padding(.vertical)
+    }
+}
