@@ -130,8 +130,8 @@ struct CollectionDetailView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
-                        .padding()
-                        .frame(width: 200)
+                        .padding(.horizontal, 3)
+                        .frame(width: 150, height:100)
                         .background(Color(.secondarySystemBackground))
                         .cornerRadius(12)
                         .shadow(radius: 4)
@@ -147,10 +147,20 @@ struct CollectionDetailView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(appViewModel.books(in: collection)) { book in
+                        VStack(alignment: .leading) {
+                            Text(book.title)
+                                .font(.headline)
+                            Text(book.author)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.orange.opacity(0.3))
                             .frame(width: 120, height: 60)
-                            .overlay(Text(book.title).font(.caption))
+                            .onTapGesture {
+                                selectedBook = book
+                                showBookDetail = true
+                            }
                     }
                 }
                 .padding(.horizontal)
@@ -159,10 +169,20 @@ struct CollectionDetailView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(appViewModel.books(in: collection)) { book in
+                        VStack(alignment: .leading) {
+                            Text(book.title)
+                                .font(.headline)
+                            Text(book.author)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.blue.opacity(0.2))
                             .frame(width: 120, height: 60)
-                            .overlay(Text(book.author).font(.caption2))
+                            .onTapGesture {
+                                selectedBook = book
+                                showBookDetail = true
+                            }
                     }
                 }
                 .padding(.horizontal)
