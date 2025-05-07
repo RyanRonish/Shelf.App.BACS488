@@ -56,9 +56,14 @@ class AuthViewModel: ObservableObject {
                                    if let id = bookData["id"] as? String,
                                       let title = bookData["title"] as? String,
                                       let author = bookData["author"] as? String,
+                                      let collectionID = bookData["collectionID"] as? String,
                                       let isbn = bookData["isbn"] as? String,
-                                      let thumbnailURL = bookData["thumbnailURL"] as? String {
-                                       let book = Book(id: id, title: title, author: author, isbn: isbn, thumbnailURL: thumbnailURL)
+                                      let thumbnailURL = bookData["thumbnailURL"] as? String,
+                                      let description = bookData["discription"] as? String,
+                                      let publisher = bookData.publisher as? String,
+                                      let year = bookData["year"] as? String
+                                   {
+                                       let book = Book(id: id, title: title, author: author, collectionID: collectionID, isbn: isbn, thumbnailURL: thumbnailURL, description: description, publisher: publisher, year: year)
                                        favoriteBooks.append(book)
                                    }
                                }
@@ -331,8 +336,12 @@ class AuthViewModel: ObservableObject {
             id: bookRef.documentID, // ✅ Assign Firestore ID during creation
             title: book.title,
             author: book.author,
+            collectionID: book.collectionID,
             isbn: book.isbn,
-            thumbnailURL: book.thumbnailURL
+            thumbnailURL: book.thumbnailURL,
+            description: book.description,
+            publisher: book.publisher,
+            year: book.year
         )
 
         do {
