@@ -11,7 +11,7 @@ import VisionKit
 
 struct ISBNScannerView: UIViewControllerRepresentable {
     @Binding var scannedBook: Book?
-    var authViewModel: AuthViewModel
+    @EnvironmentObject var authViewModel: AuthViewModel
     
     func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
         let scanner = VNDocumentCameraViewController()
@@ -89,9 +89,9 @@ struct ISBNScannerView: UIViewControllerRepresentable {
         }
         
         func fetchBookDetails(isbn: String) {
-            BookAPI.shared.fetchBookDetails(isbn: isbn, completion: { book in
+            BookAPI.searchBooks(byTitle: "") { result in
                 Task {
-                    guard let book = book else {
+                    guard case let .success(books) = result, let book = books.first else {
                         print("DEBUG: No book found for ISBN \(isbn)")
                         return
                     }
@@ -108,7 +108,7 @@ struct ISBNScannerView: UIViewControllerRepresentable {
                         }
                     }
                 }
-            })
+            }
         }
                  
         func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
@@ -117,7 +117,9 @@ struct ISBNScannerView: UIViewControllerRepresentable {
     }
 }
 
+
 #Preview {
-    ISBNScannerView(scannedBook: .constant(nil), authViewModel: AuthViewModel())
+    ISBNScannerView(scannedBook: .constant(nil))
+        .environmentObject(AuthViewModel())
 }
 

@@ -8,140 +8,123 @@
 import SwiftUI
 import FirebaseFirestore
 import FirebaseAuth
+import VisionKit
+
+
+struct RecognizedItemWrapper: Identifiable {
+    let id = UUID()
+    let item: RecognizedItem
+}
+
+enum RecognizedItem: Equatable {
+    case text(String)
+    case barcode(String)
+}
 
 struct CollectionDetailView: View {
-    @ObservedObject var collection: BookCollection  // Now works because BookCollection is ObservableObject
+    //@ObservedObject var collection: BookCollection
     @EnvironmentObject var authViewModel: AuthViewModel
-    @Environment(\.presentationMode) var presentationMode
+    @ObservedObject var appViewModel: AppViewModel
+    @State var scannedBook: Book? = nil
+    @State private var showingScanner = false
+    @State private var recognizedText = ""
     
-    @State private var showDeleteAlert = false  // ✅ Controls delete confirmation alert
-    @State private var deleteBooks = false      // ✅ Stores user choice for deleting books
-    
+    let collection: BookCollection
+
     var body: some View {
         VStack {
-            Text(collection.name)
-                .font(.largeTitle)
-                .bold()
-                .padding(.top)
-            
-            List {
-                ForEach(collection.books) { book in
-                    HStack {
+            if appViewModel.books(in: collection).isEmpty {
+                Text("No books in this collection.")
+                    .foregroundColor(.secondary)
+                    .padding()
+            } else {
+                List(appViewModel.books(in: collection)) { book in
+                    HStack(alignment: .top) {
+                        if let urlString = book.thumbnailURL, let url = URL(string: urlString) {
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 50, height: 75)
+                                    .cornerRadius(6)
+                            } placeholder: {
+                                ProgressView()
+                            }
+                        }
                         VStack(alignment: .leading) {
                             Text(book.title)
                                 .font(.headline)
                             Text(book.author)
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
-                        }
-                        Spacer()
-                    }
-                    .padding()
-                }
-                .onDelete { indexSet in
-                    for index in indexSet {
-                        let book = collection.books[index]
-                        Task {
-                            await authViewModel.deleteBook(collection: collection, book: book)
+                                .foregroundColor(.secondary)
+                            if let year = book.year {
+                                Text(year).font(.caption).foregroundColor(.gray)
+                            }
                         }
                     }
                 }
             }
-            .listStyle(InsetGroupedListStyle())
-            
-            Spacer()
-            
-            HStack {
+        }
+        .navigationTitle(collection.name)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button(action: {
-                    authViewModel.selectedCollection = collection // ✅ Ensure the correct collection is selected
-                    authViewModel.isShowingBookForm = true        // ✅ Trigger form display
+                    showingScanner = true
+                }) {
+                    Label("Scan Book", systemImage: "text.viewfinder")
+                }
+                Button(action: {
+                    authViewModel.isShowingBookForm = true
                 }) {
                     Label("Add Book", systemImage: "plus")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .clipShape(Capsule())
-                }
-                
-                Button(action: scanBook) {
-                    Label("Scan Book", systemImage: "barcode.viewfinder")
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .clipShape(Capsule())
-                }
-            }
-            .padding()
-        }
-        .navigationTitle("Books in \(collection.name)")
-        
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(role: .destructive) {
-                    showDeleteAlert = true
-                } label: {
-                    Label("Delete", systemImage: "trash")
                 }
             }
         }
-        .alert("Delete Collection", isPresented: $showDeleteAlert) {
-            Button("Delete Collection & Books", role: .destructive) {
-                deleteBooks = true
-                Task {
-                    await authViewModel.deleteCollection(collection: collection, deleteBooks: deleteBooks)
-                    presentationMode.wrappedValue.dismiss()
-                }
-            }
-            Button("Delete Collection Only", role: .destructive) {
-                deleteBooks = false
-                Task {
-                    await authViewModel.deleteCollection(collection: collection, deleteBooks: deleteBooks)
-                    presentationMode.wrappedValue.dismiss()
-                }
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("Do you want to delete the books inside this collection as well?")
-        }
-        
         .sheet(isPresented: $authViewModel.isShowingBookForm) {
-            AddBookView().environmentObject(authViewModel) // ✅ Displays Add Book Form
+            AddBookView(collectionID: collection.id ?? "")
+                .environmentObject(authViewModel)
         }
-        
-        .onChange(of: authViewModel.scannedBook) { newBook in
-            if let book = newBook {
-                Task {
-                    await authViewModel.addBookToCollection(collection: collection, book: book)
-                    authViewModel.scannedBook = nil // ✅ Reset after adding
+        .sheet(isPresented: $showingScanner) {
+            ISBNScannerView(scannedBook: $scannedBook)
+        }
+        .onChange(of: appViewModel.recognizedItems) { newItems in
+            processRecognizedItems(newItems)
+        }
+    }
+
+    // MARK: - Process Scanned Text into Book
+    func processRecognizedItems(_ newItems: [RecognizedItem]) {
+        guard let firstItem = newItems.first else { return }
+
+        guard case let .text(scannedTitleRaw) = firstItem else { return }
+        let scannedTitle = scannedTitleRaw.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        BookAPI.searchBooks(byTitle: scannedTitle) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let books):
+                    if let first = books.first {
+                        let book = Book(
+                            id: UUID().uuidString,
+                            title: first.title,
+                            author: first.author,
+                            collectionID: collection.id ?? UUID().uuidString,
+                            isbn: first.isbn,
+                            thumbnailURL: first.thumbnailURL,
+                            description: first.description,
+                            publisher: first.publisher,
+                            year: first.year
+                        )
+
+                        Task {
+                            await authViewModel.addBookToCollection(collection: collection, book: book)
+                        }
+                    }
+                case .failure(let error):
+                    print("❌ Failed to fetch book from scanned title: \(error.localizedDescription)")
                 }
             }
         }
-        
-    }
-    
-     // MARK: - Add Book Manually
-     private func addBookManually() {
-         authViewModel.showBookForm(for: collection)
-     }
-     
-     // MARK: - Scan Book
-    //scan button functionality
-    private func scanBook() {
-        authViewModel.selectedCollection = collection // ✅ Ensure the correct collection is selected
-        authViewModel.isShowingScanner = true        // ✅ Trigger the scanner
     }
 }
-
-    
-
-    #Preview {
-        CollectionDetailView(collection: BookCollection(
-            name: "Favorites",
-            ownerId: "testUser123",
-            books: [
-                Book(title: "The Hobbit", author: "J.R.R. Tolkien", isbn: "isbn", thumbnailURL: "https://example.com/default-thumbnail.jpg"),
-                Book(title: "1984", author: "George Orwell", isbn: "isbn", thumbnailURL: "https://example.com/default-thumbnail.jpg")
-            ]
-        ))
-    }
 

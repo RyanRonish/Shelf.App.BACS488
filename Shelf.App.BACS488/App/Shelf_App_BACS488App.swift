@@ -9,21 +9,11 @@ import SwiftUI
 import Firebase
 
 
-
-//class AppDelegate: NSObject, UIApplicationDelegate {
-//  func application(_ application: UIApplication,
-//                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-//    FirebaseApp.configure()
-//    return true
-//  }
-//}
-
 @main
 struct Shelf_App_BACS488App: App {
-    //let persistenceController = PersistenceController.shared
-    // register app delegate for Firebase setup
-    //@UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject var authViewModel = AuthViewModel()
+
+    @StateObject var authViewModel = AuthViewModel() // auth system
+    @StateObject var appViewModel = AppViewModel() // scanner system
     
     init() {
         FirebaseApp.configure()
@@ -31,11 +21,12 @@ struct Shelf_App_BACS488App: App {
 
     var body: some Scene {
         WindowGroup {
-            //NavigationView {
-                ContentView()
-                //.environment(\.managedObjectContext, persistenceController.container.viewContext)
-                    .environmentObject(authViewModel)
-            }
-        //}
+            ContentView()
+                .environmentObject(authViewModel) // pass auth
+                .environmentObject(appViewModel)    // pass scanner 
+                //.task {
+                    //await appViewModel.requestDataScannerAccessStatus() // requests the camera access on launch
+                //}
+        }
     }
 }

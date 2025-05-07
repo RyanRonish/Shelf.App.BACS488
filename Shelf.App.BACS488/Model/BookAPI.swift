@@ -7,72 +7,75 @@
 
 import Foundation
 
-class BookAPI {
-    static let shared = BookAPI()
-
-    func fetchBookDetails(isbn: String, completion: @escaping (Book?) -> Void) {
-        let urlString = "https://www.googleapis.com/books/v1/volumes?q=isbn:\(isbn)"
-
-        guard let url = URL(string: urlString) else {
-            print("❌ DEBUG: Invalid Google Books API URL")
-            completion(nil)
-            return
+struct BookAPI {
+    static func searchBooks(byTitle title: String, completion: @escaping (Result<[Book], Error>) -> Void) {
+        // Encode the title to be URL-safe
+        guard let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "https://www.googleapis.com/books/v1/volumes?q=\(encodedTitle)") else {
+            return completion(.failure(NSError(domain: "Invalid title", code: -1)))
         }
 
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        let task = URLSession.shared.dataTask(with: url) { data, _, error in
             if let error = error {
-                print("❌ DEBUG: API request failed - \(error.localizedDescription)")
-                completion(nil)
-                return
+                return completion(.failure(error))
             }
-            
+
             guard let data = data else {
-                print("❌ DEBUG: No data received")
-                completion(nil)
-                return
+                return completion(.failure(NSError(domain: "No data", code: -1)))
             }
 
             do {
-                let decodedResponse = try JSONDecoder().decode(GoogleBooksResponse.self, from: data)
-
-                if let bookInfo = decodedResponse.items?.first?.volumeInfo {
-                    let book = Book(
-                        id: UUID().uuidString,
-                        title: bookInfo.title ?? "Unknown Title",
-                        author: bookInfo.authors?.joined(separator: ", ") ?? "Unknown Author",
-                        isbn: isbn,
-                        thumbnailURL: bookInfo.imageLinks?.thumbnail
+                let decoded = try JSONDecoder().decode(GoogleBooksResponse.self, from: data)
+                let books = decoded.items.map { item in
+                    let isbn13 = item.volumeInfo.industryIdentifiers?
+                            .first(where: { $0.type == "ISBN_13" })?.identifier
+                    return Book(
+                        title: item.volumeInfo.title,
+                        author: item.volumeInfo.authors?.first ?? "Unknown",
+                        collectionID: "",
+                        isbn: item.volumeInfo.industryIdentifiers?
+                            .first(where: { $0.type == "ISBN_13" })?.identifier, // extract from industryIdentifiers
+                        thumbnailURL: item.volumeInfo.imageLinks?.thumbnail,
+                        description: item.volumeInfo.description,
+                        publisher: item.volumeInfo.publisher,
+                        year: item.volumeInfo.publishedDate
                     )
-                    completion(book)
-                } else {
-                    print("❌ DEBUG: No books found for ISBN: \(isbn)")
-                    completion(nil)
                 }
+                completion(.success(books))
             } catch {
-                print("❌ Error decoding JSON: \(error.localizedDescription)")
-                completion(nil)
+                completion(.failure(error))
             }
-        }.resume()
+        }
+
+        task.resume()
     }
 }
 
-// Structs to decode Google Books API response
-struct GoogleBooksResponse: Codable {
-    let items: [BookItem]?
+// MARK: - Google Books API Models
+
+struct GoogleBooksResponse: Decodable {
+    let items: [GoogleBookItem]
 }
 
-struct BookItem: Codable {
-    let volumeInfo: BookInfo
+struct GoogleBookItem: Decodable {
+    let volumeInfo: VolumeInfo
 }
 
-struct BookInfo: Codable {
+struct VolumeInfo: Decodable {
     let title: String
     let authors: [String]?
+    let description: String?
+    let publisher: String?
+    let publishedDate: String?
     let imageLinks: ImageLinks?
+    let industryIdentifiers: [IndustryIdentifier]?
 }
 
-struct ImageLinks: Codable {
+struct IndustryIdentifier: Decodable {
+    let type: String
+    let identifier: String
+}
+
+struct ImageLinks: Decodable {
     let thumbnail: String?
 }
-
-

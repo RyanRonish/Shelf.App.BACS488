@@ -11,14 +11,16 @@ import CoreData
 
 
 struct ContentView: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
-    @StateObject var library = Library()
+    @EnvironmentObject var authViewModel: AuthViewModel  // handles the user auth
+    @EnvironmentObject var appViewModel: AppViewModel   // handles the book scanning
+    @StateObject var library = Library()                 // stores book collections
     
     var body: some View {
         Group {
             if authViewModel.userSession != nil {
                 HomeView()
                     .environmentObject(library)
+                    .environmentObject(appViewModel) // pass scanner functionality to HomeView
             } else {
                 LoginView()
             }

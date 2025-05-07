@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		68C32CC42D7C11D700647D27 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 68C32CC32D7C11CB00647D27 /* README.md */; };
 		68C32CC62D7C121700647D27 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 68C32CC52D7C120700647D27 /* .gitignore */; };
+		68C32CC82D7C16BD00647D27 /* DataScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C32CC72D7C16BD00647D27 /* DataScannerView.swift */; };
+		68C32CCA2D7C171700647D27 /* ContentView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C32CC92D7C171700647D27 /* ContentView2.swift */; };
+		68C32CCE2D7C178000647D27 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C32CCD2D7C178000647D27 /* AppViewModel.swift */; };
 		68CED1932D4B826000409701 /* CollectionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CED1922D4B826000409701 /* CollectionDetailView.swift */; };
 		68CED1952D4B844700409701 /* BookCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CED1942D4B844700409701 /* BookCollection.swift */; };
 		68CED1972D4B84CF00409701 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CED1962D4B84CF00409701 /* Book.swift */; };
@@ -40,6 +43,9 @@
 /* Begin PBXFileReference section */
 		68C32CC32D7C11CB00647D27 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		68C32CC52D7C120700647D27 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		68C32CC72D7C16BD00647D27 /* DataScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataScannerView.swift; sourceTree = "<group>"; };
+		68C32CC92D7C171700647D27 /* ContentView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView2.swift; sourceTree = "<group>"; };
+		68C32CCD2D7C178000647D27 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		68CED1922D4B826000409701 /* CollectionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionDetailView.swift; sourceTree = "<group>"; };
 		68CED1942D4B844700409701 /* BookCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCollection.swift; sourceTree = "<group>"; };
 		68CED1962D4B84CF00409701 /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Book.swift; sourceTree = "<group>"; };
@@ -173,6 +179,7 @@
 		68D39A3C2D4AF506004C16F6 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				68C32CC92D7C171700647D27 /* ContentView2.swift */,
 				68D39A3D2D4AF520004C16F6 /* InputView.swift */,
 				68D39A442D4B14F4004C16F6 /* SettingsRowView.swift */,
 			);
@@ -196,6 +203,7 @@
 				68CED1922D4B826000409701 /* CollectionDetailView.swift */,
 				68CED1982D4B958500409701 /* AddBookView.swift */,
 				68CED19A2D4B95DD00409701 /* ISBNScannerView.swift */,
+				68C32CC72D7C16BD00647D27 /* DataScannerView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -204,6 +212,7 @@
 			isa = PBXGroup;
 			children = (
 				68D39A532D4B3006004C16F6 /* AuthViewModel.swift */,
+				68C32CCD2D7C178000647D27 /* AppViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -290,8 +299,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68C32CCE2D7C178000647D27 /* AppViewModel.swift in Sources */,
 				68D39A432D4B1228004C16F6 /* ProfileView.swift in Sources */,
 				68CED19F2D4B98F900409701 /* BookAPI.swift in Sources */,
+				68C32CCA2D7C171700647D27 /* ContentView2.swift in Sources */,
 				68D39A2C2D4AF108004C16F6 /* Shelf_App_BACS488.xcdatamodeld in Sources */,
 				68D39A3E2D4AF520004C16F6 /* InputView.swift in Sources */,
 				68CED1932D4B826000409701 /* CollectionDetailView.swift in Sources */,
@@ -301,6 +312,7 @@
 				68D39A3B2D4AF4F3004C16F6 /* RegistrationView.swift in Sources */,
 				68D39A392D4AF4D9004C16F6 /* LoginView.swift in Sources */,
 				68CED1972D4B84CF00409701 /* Book.swift in Sources */,
+				68C32CC82D7C16BD00647D27 /* DataScannerView.swift in Sources */,
 				68D39A542D4B3006004C16F6 /* AuthViewModel.swift in Sources */,
 				68D39A202D4AF107004C16F6 /* Shelf_App_BACS488App.swift in Sources */,
 				68CED1992D4B958500409701 /* AddBookView.swift in Sources */,

@@ -1,112 +1,125 @@
-//
-//  AddBookView.swift
-//  Shelf.App.BACS488
-//
-//  Created by Ryan Ronish on 1/30/25.
-//
-
 import SwiftUI
+import Firebase
+import FirebaseAuth
+import FirebaseFirestore
 
 struct AddBookView: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
     @Environment(\.presentationMode) var presentationMode
-    
+
+    // MARK: - Input Fields
     @State private var title: String = ""
     @State private var author: String = ""
+    //@State private var collectionID: String = ""
     @State private var isbn: String = ""
-    @State private var thumbnailURL: String = ""
-    
+    @State private var thumbnailURL: String?
+    @State private var description: String = ""
+    @State private var publisher: String = ""
+    @State private var year: String = ""
+
+    @State private var debounceTimer: Timer?
+
+    let collectionID: String // passed from parent view
+
     var body: some View {
         NavigationView {
             Form {
-                // Scan Button
-                Section {
-                    Button(action: {
-                        authViewModel.isShowingScanner = true
-                    }) {
-                        HStack {
-                            Image(systemName: "barcode.viewfinder")
-                            Text("Scan ISBN")
-                        }
-                        .foregroundColor(.blue)
-                    }
-                }
-                // 📌 Book Details
-                Section(header: Text("Book Details")) {
+                Section(header: Text("Book Info")) {
                     TextField("Title", text: $title)
+                        .onChange(of: title) { newValue in
+                            debounceTimer?.invalidate()
+                            debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
+                                fetchBookDetails(for: newValue)
+                            }
+                        }
+
                     TextField("Author", text: $author)
-                    TextField("ISBN (Optional)", text: $isbn)
-                    TextField("Thumbnail URL (Optional)", text: $thumbnailURL)
+                    TextField("ISBN", text: $isbn)
+                    TextField("Publisher", text: $publisher)
+                    TextField("Year", text: $year)
+                    TextEditor(text: $description)
+                        .frame(height: 100)
+                        .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.gray.opacity(0.4)))
                 }
-                
-                // 📌 Save Button
-                Section {
-                    Button(action: addBook) {
+
+                if let urlString = thumbnailURL, let url = URL(string: urlString) {
+                    Section(header: Text("Cover Preview")) {
                         HStack {
                             Spacer()
-                            Text("Add Book")
-                                .bold()
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 120)
+                            } placeholder: {
+                                ProgressView()
+                            }
                             Spacer()
                         }
                     }
-                    .disabled(title.isEmpty || author.isEmpty)
                 }
             }
-            .navigationTitle("Add Book")
-            .toolbar(content: {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) { // ✅ Add another button if needed
-                    Button("Save") {
-                        //saveBook()
-                    }
-                }
+            .navigationBarTitle("Add Book", displayMode: .inline)
+            .navigationBarItems(trailing: Button("Save") {
+                saveBookToFirestore()
             })
-            
-            .sheet(isPresented: $authViewModel.isShowingScanner) {
-                ISBNScannerView(scannedBook: $authViewModel.scannedBook, authViewModel: authViewModel)
-            }
-            .onChange(of: authViewModel.scannedBook) { newBook in
-                if let newBook {
-                    title = newBook.title
-                    author = newBook.author
-                    isbn = newBook.isbn ?? ""
-                    thumbnailURL = newBook.thumbnailURL ?? ""
-                    
-                    authViewModel.scannedBook = nil // Reset after setting fields
+        }
+    }
+
+    // MARK: - Autofill Book Info
+    private func fetchBookDetails(for title: String) {
+        guard !title.isEmpty else { return }
+        BookAPI.searchBooks(byTitle: title) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let books):
+                    if let first = books.first {
+                        self.title = first.title
+                        self.author = first.author
+                        self.isbn = first.isbn ?? ""
+                        self.thumbnailURL = first.thumbnailURL
+                        self.description = first.description ?? ""
+                        self.publisher = first.publisher ?? ""
+                        self.year = first.year ?? ""
+                    }
+                case .failure(let error):
+                    print("Failed to fetch book info: \(error.localizedDescription)")
                 }
             }
         }
     }
-        // 📌 Function to Add the Book
-    private func addBook() {
-            
-            guard let collection = authViewModel.selectedCollection else {
-                print("DEBUG: No collection selected.")
-                return
-            }
-            
-            let newBook = Book(
-                id: UUID().uuidString, // ✅ Generate a unique ID
-                title: title,
-                author: author,
-                isbn: isbn.isEmpty ? nil : isbn,
-                thumbnailURL: thumbnailURL.isEmpty ? nil : thumbnailURL
-            )
-            
-            Task {
-                await authViewModel.addBookToCollection(collection: collection, book: newBook)
+
+    // MARK: - Save to Firestore
+    private func saveBookToFirestore() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+
+        let db = Firestore.firestore()
+        let bookId = UUID().uuidString
+        let docRef = db.collection("users")
+            .document(uid)
+            .collection("collections")
+            .document(collectionID)
+            .collection("books")
+            .document(bookId)
+
+        let bookData: [String: Any] = [
+            "id": bookId,
+            "title": title,
+            "author": author,
+            "collectionID": collectionID,
+            "isbn": isbn,
+            "thumbnailURL": thumbnailURL ?? "",
+            "description": description,
+            "publisher": publisher,
+            "year": year
+        ]
+
+        docRef.setData(bookData) { error in
+            if let error = error {
+                print("❌ Error saving book: \(error.localizedDescription)")
+            } else {
+                print("✅ Book saved!")
                 presentationMode.wrappedValue.dismiss()
             }
         }
     }
-    
-    
-    #Preview {
-        AddBookView()
-    }
-    
-
+}
