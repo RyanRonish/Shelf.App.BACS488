@@ -26,7 +26,7 @@ struct HomeView: View {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
                         ForEach(authViewModel.collections) { collection in
-                            NavigationLink(destination: CollectionDetailView(collection: collection)
+                            NavigationLink(destination: CollectionDetailView(appViewModel: appViewModel, collection: collection)
                                 .environmentObject(appViewModel) // ✅ Pass appViewModel
                             ) {
                                 CollectionCard(collection: collection)
