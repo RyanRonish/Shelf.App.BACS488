@@ -31,6 +31,12 @@ struct CollectionDetailView: View {
     @State private var selectedBook: Book?
     @State private var showBookDetail = false
     
+    @Environment(\.dismiss) private var dismiss
+    
+    // States for alert and Fire Animation
+    @State private var showDeleteConfirmation = false
+    @State private var showFireAnimation = false
+    
     let collection: BookCollection
 
     var body: some View {
@@ -70,9 +76,19 @@ struct CollectionDetailView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(role: .destructive) {
-                    deleteCollection()
+                    showDeleteConfirmation = true
+                    //deleteCollection()
                 } label: {
                     Label("Delete Collection", systemImage: "trash")
+                        .foregroundColor(.red)
+                }
+                .alert("Delete Shelf?", isPresented: $showDeleteConfirmation) {
+                    Button("Delete", role: .destructive) {
+                        handleDeleteWithFire()
+                    }
+                    Button("Cancel", role: .cancel) { }
+                } message: {
+                    Text("This will permanently delete this shelf and all books inside. Are you sure?")
                 }
             }
         }
@@ -129,6 +145,13 @@ struct CollectionDetailView: View {
         .onChange(of: appViewModel.recognizedItems) { newItems in
             processRecognizedItems(newItems)
         }
+        // emoji fire animation
+        .overlay {
+            if showFireAnimation {
+                FireEmojiAnimationView()
+                    .transition(.opacity)
+            }
+        }
     }
 
     // MARK: - Process Scanned Text into Book
@@ -184,5 +207,44 @@ struct CollectionDetailView: View {
             }
         }
     }
+    
+    func handleDeleteWithFire() {
+        withAnimation {
+            showFireAnimation = true
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            deleteCollection()
+            withAnimation {
+                showFireAnimation = false }
+            dismiss() // Use @Environment(\.dismiss)
+        }
+    }
 }
 
+
+
+// MARK: - Fire emoji animation
+struct FireEmojiAnimationView: View {
+    let fireEmojis = ["🔥", "🔥", "🔥", "🔥", "🔥"]
+
+    var body: some View {
+        ZStack {
+            ForEach(0..<fireEmojis.count, id: \.self) { index in
+                Text(fireEmojis[index])
+                    .font(.system(size: 40))
+                    .position(
+                        x: CGFloat.random(in: 50...UIScreen.main.bounds.width - 50),
+                        y: CGFloat.random(in: 100...UIScreen.main.bounds.height - 200)
+                    )
+                    .opacity(0.7)
+                    .transition(.scale)
+                    .animation(
+                        Animation.easeInOut(duration: Double.random(in: 1.5...2.5))
+                            .repeatForever(autoreverses: true),
+                        value: UUID()
+                    )
+            }
+        }
+    }
+}
