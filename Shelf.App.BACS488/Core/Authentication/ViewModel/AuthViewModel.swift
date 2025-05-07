@@ -34,7 +34,9 @@ class AuthViewModel: ObservableObject {
 
         Task {
             await fetchUser()
-            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
+            if let collection = selectedCollection, let book = scannedBook {
+                await fetchUserCollections(collection: collection, book: book)
+            }
         }
     }
 
@@ -159,7 +161,7 @@ class AuthViewModel: ObservableObject {
             ])
             
             print("DEBUG: Collection successfully added with ID:", newCollection.id ?? "No ID")
-            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
+            //await fetchUserCollections(collection: BookCollection, book: Book)
         } catch {
             print("DEBUG: Failed to add collection: \(error.localizedDescription)")
         }
@@ -197,7 +199,7 @@ class AuthViewModel: ObservableObject {
             try await collectionRef.delete()
             print("DEBUG: Collection successfully deleted from Firestore")
 
-            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
+            //await fetchUserCollections(collection: collection, book: book)
 
         } catch {
             print("DEBUG: Error deleting collection: \(error.localizedDescription)")
@@ -248,7 +250,7 @@ class AuthViewModel: ObservableObject {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
             self.userSession = result.user
             await fetchUser()
-            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
+            //await fetchUserCollections(collection: BookCollection, book: "")
         } catch {
             print("DEBUG: Failed to log in: \(error.localizedDescription)")
         }
@@ -265,8 +267,8 @@ class AuthViewModel: ObservableObject {
             try await Firestore.firestore().collection("users").document(user.id).setData(encodedUser)
 
             await fetchUser()
-            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
-        } catch {
+            
+            } catch {
             print("DEBUG: Failed to create user: \(error.localizedDescription)")
         }
     }
@@ -353,7 +355,7 @@ class AuthViewModel: ObservableObject {
             try await bookRef.setData(from: newBook)
             print("DEBUG: Book successfully added to collection:", collection.name)
 
-            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
+            await fetchUserCollections(collection: collection, book: book)
 
         } catch {
             print("DEBUG: Failed to add book: \(error.localizedDescription)")
@@ -384,7 +386,7 @@ class AuthViewModel: ObservableObject {
             try await bookRef.delete()
             print("DEBUG: Book successfully deleted from Firestore:", book.title)
 
-            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
+            await fetchUserCollections(collection: collection, book: book)
 
         } catch {
             print("DEBUG: Failed to delete book: \(error.localizedDescription)")
