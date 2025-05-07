@@ -42,9 +42,9 @@ struct CollectionDetailView: View {
     var body: some View {
         VStack {
             if appViewModel.books(in: collection).isEmpty {
-                Text("")
+                //Text("")
                     //.foregroundColor(.secondary)
-                    .padding()
+                    //.padding()
             } else {
                 List(appViewModel.books(in: collection)) { book in
                     HStack(alignment: .top) {
