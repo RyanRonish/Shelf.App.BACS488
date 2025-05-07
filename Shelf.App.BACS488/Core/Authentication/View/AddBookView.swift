@@ -15,6 +15,7 @@ struct AddBookView: View {
     @State private var description: String = ""
     @State private var publisher: String = ""
     @State private var year: String = ""
+    @State private var searchQuery = ""
 
     @State private var debounceTimer: Timer?
 
@@ -24,6 +25,7 @@ struct AddBookView: View {
         NavigationView {
             Form {
                 Section(header: Text("Book Info")) {
+                    /*
                     TextField("Title", text: $title)
                         .onChange(of: title) { newValue in
                             debounceTimer?.invalidate()
@@ -31,6 +33,18 @@ struct AddBookView: View {
                                 fetchBookDetails(for: newValue)
                             }
                         }
+                     */
+                    // @State private var searchQuery = ""
+                     
+                     TextField("Search book by title", text: $searchQuery)
+                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                         .onSubmit {
+                             processSearch(for: searchQuery)
+                         }
+
+                     Button("Search") {
+                         processSearch(for: searchQuery)
+                     }
 
                     TextField("Author", text: $author)
                     TextField("ISBN", text: $isbn)
@@ -63,6 +77,10 @@ struct AddBookView: View {
                 saveBookToFirestore()
             })
         }
+    }
+    
+    private func processSearch(for query: String) {
+        fetchBookDetails(for: query)
     }
 
     // MARK: - Autofill Book Info

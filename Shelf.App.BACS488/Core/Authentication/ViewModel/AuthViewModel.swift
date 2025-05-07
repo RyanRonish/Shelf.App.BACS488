@@ -34,7 +34,7 @@ class AuthViewModel: ObservableObject {
 
         Task {
             await fetchUser()
-            await fetchUserCollections()
+            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
         }
     }
 
@@ -93,16 +93,17 @@ class AuthViewModel: ObservableObject {
     }
 
     // Fetch user's collections from Firestore
-    func fetchUserCollections() async {
+    func fetchUserCollections(collection: BookCollection, book: Book) async {
         guard let uid = Auth.auth().currentUser?.uid else {
             print("DEBUG: No authenticated user found.")
             return
         }
 
         let db = Firestore.firestore()
+        
         let userCollectionsRef = db.collection("users")
-            .document(uid)
-            .collection("collections")
+                .document(uid)
+                .collection("collections")
 
         do {
             let collectionsSnapshot = try await userCollectionsRef.getDocuments()
@@ -113,9 +114,13 @@ class AuthViewModel: ObservableObject {
                 collection?.id = document.documentID
 
                 if let collection = collection {
-                    let booksRef = userCollectionsRef.document(collection.id!).collection("books")
+                    let booksRef = userCollectionsRef
+                        .document(collection.id!)
+                        .collection("books")
+                    
                     let booksSnapshot = try await booksRef.getDocuments()
-                    collection.books = booksSnapshot.documents.compactMap { try? $0.data(as: Book.self) }
+                    collection.books = booksSnapshot.documents.compactMap {
+                        try? $0.data(as: Book.self) }
                     loadedCollections.append(collection)
                 }
             }
@@ -154,7 +159,7 @@ class AuthViewModel: ObservableObject {
             ])
             
             print("DEBUG: Collection successfully added with ID:", newCollection.id ?? "No ID")
-            await fetchUserCollections()
+            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
         } catch {
             print("DEBUG: Failed to add collection: \(error.localizedDescription)")
         }
@@ -192,7 +197,7 @@ class AuthViewModel: ObservableObject {
             try await collectionRef.delete()
             print("DEBUG: Collection successfully deleted from Firestore")
 
-            await fetchUserCollections()
+            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
 
         } catch {
             print("DEBUG: Error deleting collection: \(error.localizedDescription)")
@@ -243,7 +248,7 @@ class AuthViewModel: ObservableObject {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
             self.userSession = result.user
             await fetchUser()
-            await fetchUserCollections()
+            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
         } catch {
             print("DEBUG: Failed to log in: \(error.localizedDescription)")
         }
@@ -260,7 +265,7 @@ class AuthViewModel: ObservableObject {
             try await Firestore.firestore().collection("users").document(user.id).setData(encodedUser)
 
             await fetchUser()
-            await fetchUserCollections()
+            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
         } catch {
             print("DEBUG: Failed to create user: \(error.localizedDescription)")
         }
@@ -348,7 +353,7 @@ class AuthViewModel: ObservableObject {
             try await bookRef.setData(from: newBook)
             print("DEBUG: Book successfully added to collection:", collection.name)
 
-            await fetchUserCollections()
+            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
 
         } catch {
             print("DEBUG: Failed to add book: \(error.localizedDescription)")
@@ -379,7 +384,7 @@ class AuthViewModel: ObservableObject {
             try await bookRef.delete()
             print("DEBUG: Book successfully deleted from Firestore:", book.title)
 
-            await fetchUserCollections()
+            await fetchUserCollections(collection: <#BookCollection#>, book: <#Book#>)
 
         } catch {
             print("DEBUG: Failed to delete book: \(error.localizedDescription)")
