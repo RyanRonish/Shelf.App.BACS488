@@ -42,7 +42,7 @@ struct CollectionDetailView: View {
     var body: some View {
         VStack {
             if appViewModel.books(in: collection).isEmpty {
-                Text("No books in this collection.")
+                Text("No books on this shelf.")
                     .foregroundColor(.secondary)
                     .padding()
             } else {
@@ -120,7 +120,7 @@ struct CollectionDetailView: View {
                             .lineLimit(1)
                     }
                     .padding()
-                    .frame(width: 200, height: 120)
+                    .frame(width: 150, height: 300)
                     .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray6)))
                     .onTapGesture {
                         selectedBook = book // if you're using a @State for detail

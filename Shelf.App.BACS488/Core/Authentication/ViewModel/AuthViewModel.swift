@@ -350,7 +350,7 @@ class AuthViewModel: ObservableObject {
         )
 
         do {
-            try await bookRef.setData(from: newBook)
+            try bookRef.setData(from: newBook)
             print("DEBUG: Book successfully added to collection:", collection.name)
 
             await fetchUserCollections()
