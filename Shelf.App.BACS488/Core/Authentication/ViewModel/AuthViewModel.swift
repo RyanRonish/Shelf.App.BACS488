@@ -34,9 +34,7 @@ class AuthViewModel: ObservableObject {
 
         Task {
             await fetchUser()
-            if let collection = selectedCollection, let book = scannedBook {
-                await fetchUserCollections()
-            }
+            await fetchUserCollections()
         }
     }
 
