@@ -27,7 +27,7 @@ struct AddBookView: View {
                     TextField("Title", text: $title)
                         .onChange(of: title) { newValue in
                             debounceTimer?.invalidate()
-                            debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
+                            debounceTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { _ in
                                 fetchBookDetails(for: newValue)
                             }
                         }
