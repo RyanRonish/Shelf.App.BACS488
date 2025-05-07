@@ -348,6 +348,8 @@ class AuthViewModel: ObservableObject {
             publisher: book.publisher,
             year: book.year
         )
+        
+        await fetchUserCollections()
 
         do {
             try bookRef.setData(from: newBook)
