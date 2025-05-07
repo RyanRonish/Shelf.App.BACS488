@@ -152,6 +152,14 @@ struct CollectionDetailView: View {
                     .transition(.opacity)
             }
         }
+        if showFireAnimation {
+            ZStack {
+                ForEach(0..<25, id: \.self) { index in
+                    FireEmojiAnimationView()
+                }
+            }
+            .transition(.opacity)
+        }
     }
 
     // MARK: - Process Scanned Text into Book
@@ -226,6 +234,31 @@ struct CollectionDetailView: View {
 
 
 // MARK: - Fire emoji animation
+
+struct FireEmojiAnimationView: View {
+    let fireEmojis = ["🔥", "🔥", "🔥", "🔥", "🔥"]
+
+    var body: some View {
+        ZStack {
+            ForEach(0..<fireEmojis.count, id: \.self) { index in
+                Text(fireEmojis[index])
+                    .font(.system(size: 40))
+                    .position(
+                        x: CGFloat.random(in: 50...UIScreen.main.bounds.width - 50),
+                        y: CGFloat.random(in: 100...UIScreen.main.bounds.height - 200)
+                    )
+                    .opacity(0.7)
+                    .transition(.scale)
+                    .animation(
+                        Animation.easeInOut(duration: Double.random(in: 1.5...2.5))
+                            .repeatForever(autoreverses: true),
+                        value: UUID()
+                    )
+            }
+        }
+    }
+}
+
 struct FireEmojiView: View {
     @State private var yOffset: CGFloat = 0
     @State private var xOffset: CGFloat = 0
