@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		68514F272DCBE77F0081CF4B /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68514F262DCBE7710081CF4B /* BookDetailView.swift */; };
 		68C32CC42D7C11D700647D27 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 68C32CC32D7C11CB00647D27 /* README.md */; };
 		68C32CC62D7C121700647D27 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 68C32CC52D7C120700647D27 /* .gitignore */; };
 		68C32CC82D7C16BD00647D27 /* DataScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C32CC72D7C16BD00647D27 /* DataScannerView.swift */; };
@@ -41,6 +42,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		68514F262DCBE7710081CF4B /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
 		68C32CC32D7C11CB00647D27 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		68C32CC52D7C120700647D27 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		68C32CC72D7C16BD00647D27 /* DataScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataScannerView.swift; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 		68D39A512D4B2F79004C16F6 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				68514F262DCBE7710081CF4B /* BookDetailView.swift */,
 				68D39A382D4AF4D9004C16F6 /* LoginView.swift */,
 				68D39A3A2D4AF4F3004C16F6 /* RegistrationView.swift */,
 				68D39A552D4B684C004C16F6 /* HomeView.swift */,
@@ -319,6 +322,7 @@
 				68D39A562D4B684C004C16F6 /* HomeView.swift in Sources */,
 				68D39A472D4B1D27004C16F6 /* User.swift in Sources */,
 				68F43CD32D542D4B00530D26 /* Library.swift in Sources */,
+				68514F272DCBE77F0081CF4B /* BookDetailView.swift in Sources */,
 				68CED1952D4B844700409701 /* BookCollection.swift in Sources */,
 				68D39A452D4B14F4004C16F6 /* SettingsRowView.swift in Sources */,
 			);

@@ -28,6 +28,8 @@ struct CollectionDetailView: View {
     @State var scannedBook: Book? = nil
     @State private var showingScanner = false
     @State private var recognizedText = ""
+    @State private var selectedBook: Book?
+    @State private var showBookDetail = false
     
     let collection: BookCollection
 
@@ -65,6 +67,15 @@ struct CollectionDetailView: View {
                 }
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(role: .destructive) {
+                    deleteCollection()
+                } label: {
+                    Label("Delete Collection", systemImage: "trash")
+                }
+            }
+        }
         .navigationTitle(collection.name)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -78,6 +89,34 @@ struct CollectionDetailView: View {
                 }) {
                     Label("Add Book", systemImage: "plus")
                 }
+            }
+        }
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 16) {
+                ForEach(collection.books ?? []) { book in
+                    VStack(alignment: .leading) {
+                        Text(book.title)
+                            .font(.headline)
+                            .lineLimit(1)
+                        Text(book.author)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                    .padding()
+                    .frame(width: 200, height: 120)
+                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray6)))
+                    .onTapGesture {
+                        selectedBook = book // if you're using a @State for detail
+                        showBookDetail.toggle()
+                    }
+                }
+            }
+            .padding()
+        }
+        .sheet(isPresented: $showBookDetail) {
+            if let selectedBook = selectedBook {
+                BookDetailView(book: selectedBook)
             }
         }
         .sheet(isPresented: $authViewModel.isShowingBookForm) {
@@ -123,6 +162,25 @@ struct CollectionDetailView: View {
                 case .failure(let error):
                     print("❌ Failed to fetch book from scanned title: \(error.localizedDescription)")
                 }
+            }
+        }
+    }
+    
+    func deleteCollection() {
+        guard let user = Auth.auth().currentUser,
+              let id = collection.id else { return }
+
+        let db = Firestore.firestore()
+        db.collection("users")
+          .document(user.uid)
+          .collection("collections")
+          .document(id)
+          .delete { error in
+            if let error = error {
+                print("DEBUG: Failed to delete collection - \(error.localizedDescription)")
+            } else {
+                print("DEBUG: Successfully deleted collection")
+                // Optional: Navigate back
             }
         }
     }
