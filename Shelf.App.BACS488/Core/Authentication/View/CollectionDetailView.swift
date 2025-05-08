@@ -40,57 +40,59 @@ struct CollectionDetailView: View {
     @State private var showFireAnimation = false
     
     let collection: BookCollection
-    
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack {
                 if appViewModel.books(in: collection).isEmpty {
                     Text("No books in this collection yet.")
                         .foregroundColor(.gray)
                         .padding()
                 } else {
-                    ForEach([0, 1, 2], id: \.self) { shelfIndex in
-                        VStack(alignment: .leading) {
-                            Text("Shelf \(shelfIndex + 1)")
-                                .font(.headline)
-                                .padding(.leading)
-
-                            let booksOnShelf = getBooksForShelf(shelf: shelfIndex)
-
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack {
-                                    ForEach(booksOnShelf, id: \.id) { book in
-                                        BookCard(book: book)
-                                            .onTapGesture {
-                                                selectedBook = book
-                                                showBookDetail = true
-                                            }
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 16) {
+                            ForEach(appViewModel.books(in: collection)) { book in
+                                VStack {
+                                    if let url = URL(string: book.thumbnailURL ?? "") {
+                                        AsyncImage(url: url) { image in
+                                            image.resizable()
+                                        } placeholder: {
+                                            ProgressView()
+                                        }
+                                        .frame(width: 100, height: 150)
+                                        .cornerRadius(8)
                                     }
+                                    Text(book.title)
+                                        .font(.caption)
+                                        .frame(width: 100)
+                                        .lineLimit(1)
                                 }
-                                .padding(.horizontal)
+                                .onTapGesture {
+                                    selectedBook = book
+                                    showBookDetail = true
+                                }
                             }
                         }
+                        .padding(.horizontal)
                     }
                 }
             }
-        }
             .navigationTitle(collection.name)
             .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(role: .destructive) {
-                    showDeleteConfirmation = true
-                } label: {
-                    Label("Delete Collection", systemImage: "trash")
-                        .foregroundColor(.red)
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(role: .destructive) {
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete Collection", systemImage: "trash")
+                            .foregroundColor(.red)
+                    }
                 }
-            }
-            .toolbar {
+
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
                         showingScanner = true
                     } label: {
                         Label("Scan Book", systemImage: "text.viewfinder")
                     }
+
                     Button {
                         authViewModel.isShowingBookForm = true
                     } label: {
@@ -98,112 +100,21 @@ struct CollectionDetailView: View {
                     }
                 }
             }
-        }
-        .alert("Delete Shelf?", isPresented: $showDeleteConfirmation) {
-            Button("Delete", role: .destructive) {
-                handleDeleteWithFire()
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("This will permanently delete this shelf and all books inside. Are you sure?")
-        }
-        .sheet(isPresented: $showBookDetail) {
-            if let book = selectedBook {
-                BookDetailView(collection: collection, book: book)
-            }
-        }
-        
-        if showFireAnimation {
-            FireEmojiAnimationView()
-                .transition(.opacity)
-        }
-    }
-    
-    func getBooksForShelf(shelf: Int) -> [Book] {
-        let allBooks = appViewModel.books(in: collection)
-        let countPerShelf = max(allBooks.count / 3, 1)
-        let start = shelf * countPerShelf
-        let end = min(start + countPerShelf, allBooks.count)
-        return Array(allBooks[start..<end])
-    }
-    
-    func ZStack() {
-        VStack {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(appViewModel.books(in: collection)) { book in
-                        VStack(alignment: .leading) {
-                            Text(book.title)
-                                .font(.headline)
-                            Text(book.author)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.horizontal, 3)
-                        .frame(width: 150, height:100)
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(12)
-                        .shadow(radius: 4)
-                        .onTapGesture {
-                            selectedBook = book
-                            showBookDetail = true
-                        }
-                    }
+            .alert("Delete Shelf?", isPresented: $showDeleteConfirmation) {
+                Button("Delete", role: .destructive) {
+                    handleDeleteWithFire()
                 }
-                .padding(.horizontal)
-            }
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(appViewModel.books(in: collection)) { book in
-                        VStack(alignment: .leading) {
-                            Text(book.title)
-                                .font(.headline)
-                            Text(book.author)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.orange.opacity(0.3))
-                            .frame(width: 120, height: 60)
-                            .onTapGesture {
-                                selectedBook = book
-                                showBookDetail = true
-                            }
-                    }
-                }
-                .padding(.horizontal)
-            }
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(appViewModel.books(in: collection)) { book in
-                        VStack(alignment: .leading) {
-                            Text(book.title)
-                                .font(.headline)
-                            Text(book.author)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.blue.opacity(0.2))
-                            .frame(width: 120, height: 60)
-                            .onTapGesture {
-                                selectedBook = book
-                                showBookDetail = true
-                            }
-                    }
-                }
-                .padding(.horizontal)
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will permanently delete this shelf and all books inside. Are you sure?")
             }
             .sheet(isPresented: $showBookDetail) {
-                if let selectedBook = selectedBook {
-                    BookDetailView(collection: selectedCollection!, book: selectedBook)
+                if let book = selectedBook {
+                    BookDetailView(collection: collection, book: book)
                 }
             }
             .sheet(isPresented: $authViewModel.isShowingBookForm) {
                 AddBookView(collectionID: collection.id ?? "")
-                    .environmentObject(authViewModel)
             }
             .sheet(isPresented: $showingScanner) {
                 ISBNScannerView(scannedBook: $scannedBook)
@@ -211,30 +122,19 @@ struct CollectionDetailView: View {
             .onChange(of: appViewModel.recognizedItems) { newItems in
                 processRecognizedItems(newItems)
             }
-            // emoji fire animation
-            .overlay {
-                if showFireAnimation {
-                    FireEmojiView()
-                        .transition(.opacity)
-                }
-            }
+
             if showFireAnimation {
-                SwiftUICore.ZStack {
-                    ForEach(0..<25, id: \.self) { index in
-                        FireEmojiAnimationView()
-                    }
-                }
-                .transition(.opacity)
+                FireEmojiAnimationView()
+                    .transition(.opacity)
             }
         }
-        
-        // MARK: - Process Scanned Text into Book
-        func processRecognizedItems(_ newItems: [RecognizedItem]) {
+
+        private func processRecognizedItems(_ newItems: [RecognizedItem]) {
             guard let firstItem = newItems.first else { return }
-            
             guard case let .text(scannedTitleRaw) = firstItem else { return }
+
             let scannedTitle = scannedTitleRaw.trimmingCharacters(in: .whitespacesAndNewlines)
-            
+
             BookAPI.searchBooks(byTitle: scannedTitle) { result in
                 DispatchQueue.main.async {
                     switch result {
@@ -251,7 +151,6 @@ struct CollectionDetailView: View {
                                 publisher: first.publisher,
                                 year: first.year
                             )
-                            
                             Task {
                                 await authViewModel.addBookToCollection(collection: collection, book: book)
                             }
@@ -262,41 +161,38 @@ struct CollectionDetailView: View {
                 }
             }
         }
-    }
-    
-    func deleteCollection() {
-        guard let user = Auth.auth().currentUser else { return }
-        guard let id = collection.id else { return }
-        
-        let db = Firestore.firestore()
-        db.collection("users")
-            .document(user.uid)
-            .collection("collections")
-            .document(id)
-            .delete { error in
-                if let error = error {
-                    print("DEBUG: Failed to delete collection - \(error.localizedDescription)")
-                } else {
-                    print("DEBUG: Successfully deleted collection")
-                    if let index = authViewModel.collections.firstIndex(where: { $0.id == id }) {
-                        authViewModel.collections.remove(at: index)
+
+        private func handleDeleteWithFire() {
+            withAnimation { showFireAnimation = true }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                deleteCollection()
+                showFireAnimation = false
+                dismiss()
+            }
+        }
+
+        private func deleteCollection() {
+            guard let user = Auth.auth().currentUser, let id = collection.id else { return }
+
+            Firestore.firestore()
+                .collection("users")
+                .document(user.uid)
+                .collection("collections")
+                .document(id)
+                .delete { error in
+                    if let error = error {
+                        print("❌ Failed to delete collection: \(error.localizedDescription)")
+                    } else {
+                        print("✅ Collection deleted")
+                        if let index = authViewModel.collections.firstIndex(where: { $0.id == id }) {
+                            authViewModel.collections.remove(at: index)
+                        }
                     }
                 }
-            }
-    }
-    
-    private func handleDeleteWithFire() {
-        withAnimation {
-            showFireAnimation = true
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            deleteCollection()
-            showFireAnimation = false
-            dismiss() // Use @Environment(\.dismiss)
         }
     }
-}
+
     // MARK: - Fire emoji animation
     struct FireEmojiAnimationView: View {
         let fireEmojis = Array(repeating: "🔥", count: 25) // repeat fire emoji 25 times
