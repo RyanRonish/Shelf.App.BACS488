@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		68514F272DCBE77F0081CF4B /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68514F262DCBE7710081CF4B /* BookDetailView.swift */; };
+		68B47E0D2DCC421200ED3B83 /* BookCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B47E0C2DCC420700ED3B83 /* BookCard.swift */; };
 		68C32CC42D7C11D700647D27 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 68C32CC32D7C11CB00647D27 /* README.md */; };
 		68C32CC62D7C121700647D27 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 68C32CC52D7C120700647D27 /* .gitignore */; };
 		68C32CC82D7C16BD00647D27 /* DataScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C32CC72D7C16BD00647D27 /* DataScannerView.swift */; };
@@ -43,6 +44,7 @@
 
 /* Begin PBXFileReference section */
 		68514F262DCBE7710081CF4B /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
+		68B47E0C2DCC420700ED3B83 /* BookCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCard.swift; sourceTree = "<group>"; };
 		68C32CC32D7C11CB00647D27 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		68C32CC52D7C120700647D27 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		68C32CC72D7C16BD00647D27 /* DataScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataScannerView.swift; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 		68D39A512D4B2F79004C16F6 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				68B47E0C2DCC420700ED3B83 /* BookCard.swift */,
 				68514F262DCBE7710081CF4B /* BookDetailView.swift */,
 				68D39A382D4AF4D9004C16F6 /* LoginView.swift */,
 				68D39A3A2D4AF4F3004C16F6 /* RegistrationView.swift */,
@@ -308,6 +311,7 @@
 				68C32CCA2D7C171700647D27 /* ContentView2.swift in Sources */,
 				68D39A2C2D4AF108004C16F6 /* Shelf_App_BACS488.xcdatamodeld in Sources */,
 				68D39A3E2D4AF520004C16F6 /* InputView.swift in Sources */,
+				68B47E0D2DCC421200ED3B83 /* BookCard.swift in Sources */,
 				68CED1932D4B826000409701 /* CollectionDetailView.swift in Sources */,
 				68D39A292D4AF108004C16F6 /* Persistence.swift in Sources */,
 				68D39A222D4AF107004C16F6 /* ContentView.swift in Sources */,

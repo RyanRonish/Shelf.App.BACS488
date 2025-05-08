@@ -17,6 +17,11 @@ struct CollectionDetailView: View {
     let collection: BookCollection
 
     @Environment(\.dismiss) private var dismiss
+    
+    enum RecognizedItem: Equatable {
+        case text(String)
+        case barcode(String)
+    }
 
     var body: some View {
         VStack {
@@ -93,8 +98,8 @@ struct CollectionDetailView: View {
         .sheet(isPresented: $showingScanner) {
             ISBNScannerView(scannedBook: $scannedBook)
         }
-        .onChange(of: appViewModel.recognizedItems) { newItems in
-            processRecognizedItems(newItems)
+        .onReceive(appViewModel.$recognizedItems) { newItems in
+            processRecognizedItems(newItems as [RecognizedItem])
         }
 
         if showFireAnimation {
@@ -116,9 +121,9 @@ struct CollectionDetailView: View {
 
     private func processRecognizedItems(_ newItems: [RecognizedItem]) {
         guard let firstItem = newItems.first else { return }
-        guard case let .text(scannedTitleRaw) = firstItem else { return }
+        guard case let .text(rawText) = firstItem else { return }
 
-        let scannedTitle = scannedTitleRaw.trimmingCharacters(in: .whitespacesAndNewlines)
+        let scannedTitle = rawText.trimmingCharacters(in: .whitespacesAndNewlines)
 
         BookAPI.searchBooks(byTitle: scannedTitle) { result in
             DispatchQueue.main.async {
@@ -177,5 +182,29 @@ struct CollectionDetailView: View {
                     }
                 }
             }
+    }
+    
+    struct FireEmojiAnimationView: View {
+        let fireEmojis = Array(repeating: "🔥", count: 25)
+
+        var body: some View {
+            ZStack {
+                ForEach(0..<fireEmojis.count, id: \.self) { index in
+                    Text(fireEmojis[index])
+                        .font(.system(size: 40))
+                        .position(
+                            x: CGFloat.random(in: 50...UIScreen.main.bounds.width - 50),
+                            y: CGFloat.random(in: 100...UIScreen.main.bounds.height - 200)
+                        )
+                        .opacity(0.7)
+                        .transition(.scale)
+                        .animation(
+                            Animation.easeInOut(duration: Double.random(in: 1.5...2.5))
+                                .repeatForever(autoreverses: true),
+                            value: UUID()
+                        )
+                }
+            }
+        }
     }
 }
