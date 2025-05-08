@@ -16,12 +16,12 @@ struct Book: Identifiable, Codable, Equatable {
     let isbn: String?
     let thumbnailURL: String?
 
-    // 🔹 New optional fields for autofill
+    // fields for autofill
     let description: String?
     let publisher: String?
     let year: String?
 
-    // ✅ Implement Equatable Protocol
+    // equitable protocol
     static func == (lhs: Book, rhs: Book) -> Bool {
         return lhs.id == rhs.id &&
                lhs.title == rhs.title &&

@@ -35,7 +35,7 @@ struct User: Identifiable, Codable {
     }
 }
 
-// ✅ Sample Book Model (Used for favorite books)
+
 /*struct Book: Identifiable, Codable {
     @DocumentID var id: String?
     let title: String
@@ -43,7 +43,7 @@ struct User: Identifiable, Codable {
 }
 */
 /*
-// ✅ Mock Data for Preview & Testing
+//
 extension User {
     static var MOCK_USER = User(
         id: "123456",

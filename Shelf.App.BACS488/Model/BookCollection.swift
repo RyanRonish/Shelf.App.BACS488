@@ -31,7 +31,7 @@ class BookCollection: ObservableObject, Identifiable, Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
-        ownerId = try container.decode(String.self, forKey: .ownerId)  // ✅ Decode ownerId
+        ownerId = try container.decode(String.self, forKey: .ownerId)  // Decode ownerId
         books = try container.decode([Book].self, forKey: .books)
     }
 
@@ -39,7 +39,7 @@ class BookCollection: ObservableObject, Identifiable, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
-        try container.encode(ownerId, forKey: .ownerId)  // ✅ Encode ownerId
+        try container.encode(ownerId, forKey: .ownerId)  // Encode ownerId
         try container.encode(books, forKey: .books)
     }
 }

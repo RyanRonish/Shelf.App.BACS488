@@ -5,6 +5,8 @@
 //  Created by Ryan Ronish on 2/5/25.
 //
 
+
+// Dont use this one
 import Foundation
 
 class Library: ObservableObject {
@@ -28,6 +30,6 @@ class Library: ObservableObject {
     }
 
     func save() {
-        // Save collections persistently (e.g., UserDefaults, CoreData, Firebase)
+        // Save collections persistently
     }
 }

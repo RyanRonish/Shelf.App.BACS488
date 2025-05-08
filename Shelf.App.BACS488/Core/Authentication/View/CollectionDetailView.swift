@@ -93,9 +93,9 @@ struct CollectionDetailView: View {
             .document(id)
             .delete { error in
                 if let error = error {
-                    print("❌ Failed to delete collection: \(error.localizedDescription)")
+                    print(" Failed to delete collection: \(error.localizedDescription)")
                 } else {
-                    print("✅ Successfully deleted collection")
+                    print(" Successfully deleted collection")
                     if let index = authViewModel.collections.firstIndex(where: { $0.id == id }) {
                         authViewModel.collections.remove(at: index)
                     }

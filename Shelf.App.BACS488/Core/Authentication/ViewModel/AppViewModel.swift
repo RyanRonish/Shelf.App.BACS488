@@ -42,7 +42,7 @@ final class AppViewModel: ObservableObject {
         case .barcode:
             return .barcode()
         case .text, .bookCover:
-            return .text(textContentType: .none) // ✅ Book covers will extract raw text
+            return .text(textContentType: .none) // book covers will extract raw text
         }
     }
     

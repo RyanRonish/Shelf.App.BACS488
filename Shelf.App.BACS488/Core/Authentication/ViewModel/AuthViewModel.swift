@@ -22,9 +22,9 @@ protocol AuthenticationFormProtocol {
 class AuthViewModel: ObservableObject {
     @Published var userSession: FirebaseAuth.User?
     @Published var currentUser: User?
-    @Published var collections: [BookCollection] = []  // ✅ Stores user collections
-    @Published var selectedCollection: BookCollection? // ✅ Stores the selected collection for book form
-    @Published var isShowingBookForm: Bool = false    // ✅ Controls UI state for book form
+    @Published var collections: [BookCollection] = []  //  stores user collections
+    @Published var selectedCollection: BookCollection? //  stores the selected collection for book form
+    @Published var isShowingBookForm: Bool = false    // controls UI state for book form
     
     @Published var scannedBook: Book? // Stores the scanned book details
     @Published var isShowingScanner = false // Controls when the scanner is active
@@ -49,7 +49,6 @@ class AuthViewModel: ObservableObject {
         do {
             let document = try await userRef.getDocument()
             if let data = document.data() {
-                // ✅ Fix: Convert Firestore array into Book objects safely
                 var favoriteBooks: [Book] = []
                 if let booksArray = data["favoriteBooks"] as? [[String: Any]] {
                                for bookData in booksArray {
@@ -76,7 +75,7 @@ class AuthViewModel: ObservableObject {
                     email: data["email"] as? String ?? "",
                     avatarUrl: data["avatarUrl"] as? String,
                     bio: data["bio"] as? String,
-                    favoriteBooks: favoriteBooks, // ✅ Now safely mapped
+                    favoriteBooks: favoriteBooks, //  mapped
                     totalBooks: data["totalBooks"] as? Int ?? 0,
                     totalCollections: data["totalCollections"] as? Int ?? 0,
                     joinDate: Date(timeIntervalSince1970: data["joinDate"] as? TimeInterval ?? Date().timeIntervalSince1970),
@@ -92,7 +91,7 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    // Fetch user's collections from Firestore
+    // gets user's collections from Firestore
     func fetchUserCollections() async {
         guard let uid = Auth.auth().currentUser?.uid else {
             print("DEBUG: No authenticated user found.")
@@ -134,7 +133,7 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    // Add a new book collection
+    // new book collection
     func addCollection(name: String) async {
         guard let uid = Auth.auth().currentUser?.uid else {
             print("DEBUG: No authenticated user found.")
@@ -185,7 +184,7 @@ class AuthViewModel: ObservableObject {
 
         do {
             if deleteBooks {
-                // ✅ Delete all books inside the collection
+                // remove all books inside the collection
                 let booksRef = collectionRef.collection("books")
                 let booksSnapshot = try await booksRef.getDocuments()
                 for document in booksSnapshot.documents {
@@ -204,7 +203,6 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    // Update user profile fields (e.g., bio, avatar, dark mode)
     func updateUserField(field: String, value: Any) async {
         guard let uid = currentUser?.id else { return }
         let userRef = Firestore.firestore().collection("users").document(uid)
@@ -227,8 +225,9 @@ class AuthViewModel: ObservableObject {
             print("DEBUG: Error updating user data: \(error.localizedDescription)")
         }
     }
-
-    // Upload Profile Picture to Firebase Storage
+    
+////////// ppr
+    ///
     func uploadProfilePicture(data: Data) async {
         guard let uid = currentUser?.id else { return }
         let storageRef = Storage.storage().reference().child("profile_pics/\(uid).jpg")
@@ -242,7 +241,7 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    // Sign-in with email and password
+    // only gmail works
     func signIn(withEmail email: String, password: String) async throws {
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
@@ -254,7 +253,7 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    // Create a new user
+    //new user
     func createUser(withEmail email: String, password: String, fullname: String) async throws {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
@@ -295,7 +294,7 @@ class AuthViewModel: ObservableObject {
             "favoriteBooks": user.favoriteBooks.map { ["id": $0.id, "title": $0.title, "author": $0.author, "isbn": $0.isbn, "thumbnailURL": $0.thumbnailURL] },
             "totalBooks": user.totalBooks,
             "totalCollections": user.totalCollections,
-            "joinDate": (user.joinDate ?? Date()).timeIntervalSince1970,  // ✅ Convert Date to timestamp
+            "joinDate": (user.joinDate ?? Date()).timeIntervalSince1970,
             "isDarkModeEnabled": user.isDarkModeEnabled
         ]
 
@@ -338,7 +337,7 @@ class AuthViewModel: ObservableObject {
             .document() // Firestore auto-generates book ID
 
         let newBook = Book(
-            id: bookRef.documentID, // ✅ Assign Firestore ID during creation
+            id: bookRef.documentID, 
             title: book.title,
             author: book.author,
             collectionID: book.collectionID,

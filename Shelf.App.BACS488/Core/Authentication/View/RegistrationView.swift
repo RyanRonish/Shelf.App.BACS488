@@ -104,8 +104,6 @@ struct RegistrationView: View {
     }
 }
 
-// MARK: - AuthenticationFormProtocol
-
 extension RegistrationView: AuthenticationFormProtocol {
     var formIsValid: Bool {
         return !email.isEmpty

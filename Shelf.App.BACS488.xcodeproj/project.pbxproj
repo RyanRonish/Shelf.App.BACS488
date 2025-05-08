@@ -153,7 +153,6 @@
 			isa = PBXGroup;
 			children = (
 				68D39A372D4AF4A6004C16F6 /* Root */,
-				68D39A212D4AF107004C16F6 /* ContentView.swift */,
 				68D39A362D4AF490004C16F6 /* Authentication */,
 				68D39A352D4AF47F004C16F6 /* Profile */,
 			);
@@ -180,6 +179,7 @@
 		68D39A372D4AF4A6004C16F6 /* Root */ = {
 			isa = PBXGroup;
 			children = (
+				68D39A212D4AF107004C16F6 /* ContentView.swift */,
 			);
 			path = Root;
 			sourceTree = "<group>";

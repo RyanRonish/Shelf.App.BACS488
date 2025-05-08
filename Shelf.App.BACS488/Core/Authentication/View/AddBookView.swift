@@ -133,9 +133,9 @@ struct AddBookView: View {
 
         docRef.setData(bookData) { error in
             if let error = error {
-                print("❌ Error saving book: \(error.localizedDescription)")
+                print("Error saving book: \(error.localizedDescription)")
             } else {
-                print("✅ Book saved!")
+                print("Book saved!")
                 presentationMode.wrappedValue.dismiss()
             }
         }

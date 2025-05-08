@@ -43,7 +43,7 @@ struct ISBNScannerView: UIViewControllerRepresentable {
             let image = scan.imageOfPage(at: 0)
             
             DispatchQueue.global(qos: .userInitiated).async {
-                self.processImage(image) // ✅ Process image in background
+                self.processImage(image) // process image in background
             }
             
             DispatchQueue.main.async {

@@ -27,7 +27,7 @@ struct HomeView: View {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
                         ForEach(authViewModel.collections) { collection in
                             NavigationLink(destination: CollectionDetailView(appViewModel: appViewModel, collection: collection)
-                                .environmentObject(appViewModel) // ✅ Pass appViewModel
+                                .environmentObject(appViewModel) // pass appViewModel
                             ) {
                                 CollectionCard(collection: collection)
                             }
@@ -35,9 +35,9 @@ struct HomeView: View {
                     }
                     .padding()
                 }
-                // 📌 Add Collection & Scan Buttons
+                // Add and Scan Buttons
                 HStack(spacing: 20) {
-                    // ✅ Add Collection Button
+                    // Add Collection Button
                     Button(action: { showAddCollectionSheet = true }) {
                         HStack {
                             Image(systemName: "plus.circle.fill")
@@ -50,7 +50,7 @@ struct HomeView: View {
                         .cornerRadius(10)
                     }
                     
-                    // ✅ Scan Book Button
+                    // Scan Button
                     Button(action: {
                         appViewModel.scanType = .bookCover //book cover scanning
                         showScanner = true })
@@ -69,26 +69,26 @@ struct HomeView: View {
                 .padding()
             }
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: profileButton) // ✅ Profile Button
+            .navigationBarItems(trailing: profileButton) // Profile Button
             .sheet(isPresented: $showAddCollectionSheet) {
                 addCollectionSheet
             }
             .sheet(isPresented: $showScanner) {
-                // ✅ Open Scanner when the button is clicked
+                // Scanner when the button is clicked
                 ISBNScannerView(scannedBook: $appViewModel.scannedBook)
                     .environmentObject(authViewModel)
                     .onAppear {
-                        // ✅ Automatically process scanned book
+                        // Automatically process scanned book
                         if let book = appViewModel.scannedBook {
                             addScannedBook(book)
-                            appViewModel.scannedBook = nil // ✅ Reset after adding
+                            appViewModel.scannedBook = nil // Reset after adding
                         }
                     }
             }
         }
     }
     
-    // 📌 Function to Save Scanned Book to Firestore
+    // Function to Save Scanned Book to Firestore
     private func addScannedBook(_ book: Book) {
         guard let collection = authViewModel.selectedCollection else {
             print("DEBUG: No collection selected.")
