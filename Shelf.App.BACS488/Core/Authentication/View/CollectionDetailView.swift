@@ -29,9 +29,9 @@ struct CollectionDetailView: View {
                 VStack(alignment: .leading, spacing: 32) {
                     ForEach(0..<3, id: \.self) { rowIndex in
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Shelf \(rowIndex + 1)")
-                                .font(.title3.bold())
-                                .padding(.leading, 16)
+                            //Text("Shelf \(rowIndex + 1)")
+                                //.font(.title3.bold())
+                                //.padding(.leading, 16)
 
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 16) {
