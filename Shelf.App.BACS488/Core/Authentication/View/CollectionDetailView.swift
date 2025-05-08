@@ -84,17 +84,18 @@ struct CollectionDetailView: View {
                         .foregroundColor(.red)
                 }
             }
-            
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button {
-                    showingScanner = true
-                } label: {
-                    Label("Scan Book", systemImage: "text.viewfinder")
-                }
-                Button {
-                    authViewModel.isShowingBookForm = true
-                } label: {
-                    Label("Add Book", systemImage: "plus")
+            .toolbar {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button {
+                        showingScanner = true
+                    } label: {
+                        Label("Scan Book", systemImage: "text.viewfinder")
+                    }
+                    Button {
+                        authViewModel.isShowingBookForm = true
+                    } label: {
+                        Label("Add Book", systemImage: "plus")
+                    }
                 }
             }
         }
