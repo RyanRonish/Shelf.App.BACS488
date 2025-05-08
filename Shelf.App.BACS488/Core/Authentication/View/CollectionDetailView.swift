@@ -72,19 +72,6 @@ struct CollectionDetailView: View {
                         }
                     }
                 }
-
-                // ✅ ADD BUTTON: always visible
-                Button(action: {
-                    showingScanner = true
-                }) {
-                    Label("Add Book", systemImage: "plus")
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                        .padding()
-                }
             }
         }
             .navigationTitle(collection.name)
