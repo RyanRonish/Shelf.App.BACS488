@@ -72,14 +72,17 @@ final class AppViewModel: ObservableObject {
         allBooks.filter { $0.collectionID == collection.id }
     }
     
-    func fetchBooks() {
+    func fetchBooks(for collection: BookCollection) {
         // Get user
         guard let user = Auth.auth().currentUser else { return }
+        guard let collectionID = collection.id else { return }
 
         Firestore.firestore()
             .collection("users")
             .document(user.uid)
-            .collection("books")  // Or "collections/<collectionID>/books" if nested
+            .collection("collections")
+            .document(collectionID)
+            .collection("books")
             .getDocuments { snapshot, error in
                 if let documents = snapshot?.documents {
                     self.allBooks = documents.compactMap { try? $0.data(as: Book.self) }

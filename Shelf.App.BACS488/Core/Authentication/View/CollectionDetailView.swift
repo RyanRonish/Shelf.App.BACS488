@@ -24,6 +24,10 @@ struct CollectionDetailView: View {
     }
 
     var body: some View {
+        
+        let booksInCollection = appViewModel.books(in: collection)
+        print("🟡 Books in collection \(collection.id ?? "nil"):", booksInCollection.map { $0.title })
+        
         VStack {
             if appViewModel.books(in: collection).isEmpty {
                 Text("No books in this collection yet.")
@@ -52,7 +56,9 @@ struct CollectionDetailView: View {
                         }
                     }
                 }
-            }
+                
+        .onAppear {
+            appViewModel.fetchBooks(for: collection)
         }
         .navigationTitle(collection.name)
         .toolbar {
