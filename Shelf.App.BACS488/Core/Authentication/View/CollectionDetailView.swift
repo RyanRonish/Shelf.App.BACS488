@@ -42,35 +42,48 @@ struct CollectionDetailView: View {
     let collection: BookCollection
     
     var body: some View {
-        VStack {
-            if appViewModel.books(in: collection).isEmpty {
-                Text("No books in this collection yet.")
-                    .foregroundColor(.gray)
-                    .padding()
-            } else {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        ForEach(0..<3) { shelfIndex in
-                            VStack(alignment: .leading) {
-                                Text("Shelf \(shelfIndex + 1)")
-                                    .font(.headline)
-                                    .padding(.leading)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                if appViewModel.books(in: collection).isEmpty {
+                    Text("No books in this collection yet.")
+                        .foregroundColor(.gray)
+                        .padding()
+                } else {
+                    ForEach([0, 1, 2], id: \.self) { shelfIndex in
+                        VStack(alignment: .leading) {
+                            Text("Shelf \(shelfIndex + 1)")
+                                .font(.headline)
+                                .padding(.leading)
 
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack {
-                                        ForEach(getBooksForShelf(shelf: shelfIndex), id: \.id) { book in
-                                            BookCard(book: book)
-                                                .onTapGesture {
-                                                    selectedBook = book
-                                                    showBookDetail = true
-                                                }
-                                        }
+                            let booksOnShelf = getBooksForShelf(shelf: shelfIndex)
+
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack {
+                                    ForEach(booksOnShelf, id: \.id) { book in
+                                        BookCard(book: book)
+                                            .onTapGesture {
+                                                selectedBook = book
+                                                showBookDetail = true
+                                            }
                                     }
-                                    .padding(.horizontal)
                                 }
+                                .padding(.horizontal)
                             }
                         }
                     }
+                }
+
+                // ✅ ADD BUTTON: always visible
+                Button(action: {
+                    showingScanner = true
+                }) {
+                    Label("Add Book", systemImage: "plus")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                        .padding()
                 }
             }
         }
