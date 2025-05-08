@@ -10,6 +10,9 @@ import AVKit
 import Foundation
 import SwiftUI
 import VisionKit
+import Firebase
+import FirebaseFirestore
+import FirebaseAuth
 
 enum ScanType: String {
     case barcode, text, bookCover //added bookcover option
@@ -66,7 +69,22 @@ final class AppViewModel: ObservableObject {
     }
     
     func books(in collection: BookCollection) -> [Book] {
-        return allBooks.filter { $0.collectionID == collection.id }
+        allBooks.filter { $0.collectionID == collection.id }
+    }
+    
+    func fetchBooks() {
+        // Get user
+        guard let user = Auth.auth().currentUser else { return }
+
+        Firestore.firestore()
+            .collection("users")
+            .document(user.uid)
+            .collection("books")  // Or "collections/<collectionID>/books" if nested
+            .getDocuments { snapshot, error in
+                if let documents = snapshot?.documents {
+                    self.allBooks = documents.compactMap { try? $0.data(as: Book.self) }
+                }
+            }
     }
     
     func requestDataScannerAccessStatus() async {
